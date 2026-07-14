@@ -38,6 +38,7 @@ function getCategoryLabel(cat: string): string {
     notes: '笔记',
     nuxt: 'Nuxt',
     nitro: 'Nitro',
+    python: 'Python',
   }
   return labels[cat] || cat
 }

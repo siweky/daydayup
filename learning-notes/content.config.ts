@@ -14,5 +14,9 @@ export default defineContentConfig({
       type: 'page',
       source: 'nitro/**',
     }),
+    python: defineCollection({
+      type: 'page',
+      source: 'python/**',
+    }),
   },
 })

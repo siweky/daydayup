@@ -9,6 +9,7 @@ const navLinks = [
   { label: '笔记', to: '/notes' },
   { label: 'Nuxt', to: '/nuxt' },
   { label: 'Nitro', to: '/nitro' },
+  { label: 'Python', to: '/python' },
   { label: '管理', to: '/manage' },
 ]
 

@@ -33,11 +33,11 @@ export default defineEventHandler(async (event) => {
   }
 
   // Validate category
-  const validCategories = ['notes', 'nuxt', 'nitro']
+  const validCategories = ['notes', 'nuxt', 'nitro', 'python']
   if (!validCategories.includes(category)) {
     throw createError({
       statusCode: 400,
-      message: '无效的分类，可选值: notes, nuxt, nitro',
+      message: '无效的分类，可选值: notes, nuxt, nitro, python',
     })
   }
 

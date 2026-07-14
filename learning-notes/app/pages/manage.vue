@@ -16,6 +16,7 @@ const categories = [
   { value: 'notes', label: '个人笔记' },
   { value: 'nuxt', label: 'Nuxt 文档' },
   { value: 'nitro', label: 'Nitro 文档' },
+  { value: 'python', label: 'Python 文档' },
 ]
 
 async function fetchFiles() {

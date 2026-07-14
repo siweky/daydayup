@@ -11,7 +11,7 @@ const pathParts = computed(() => {
 
 const collectionName = computed(() => {
   const first = pathParts.value[0] || ''
-  if (['notes', 'nuxt', 'nitro'].includes(first)) return first
+  if (['notes', 'nuxt', 'nitro', 'python'].includes(first)) return first
   return ''
 })
 
@@ -23,7 +23,7 @@ const { data: page } = await useAsyncData(
   async () => {
     const col = collectionName.value
     if (col) {
-      return queryCollection(col as 'notes' | 'nuxt' | 'nitro')
+      return queryCollection(col as 'notes' | 'nuxt' | 'nitro' | 'python')
         .path(fullPath.value)
         .first()
     }
@@ -48,6 +48,7 @@ const breadcrumbs = computed(() => {
     notes: '笔记',
     nuxt: 'Nuxt',
     nitro: 'Nitro',
+    python: 'Python',
   }
 
   if (parts.length > 0 && categoryLabels[parts[0]]) {
@@ -126,6 +127,7 @@ function getCategoryLabel(col: string): string {
     notes: '笔记',
     nuxt: 'Nuxt',
     nitro: 'Nitro',
+    python: 'Python',
   }
   return labels[col] || col
 }

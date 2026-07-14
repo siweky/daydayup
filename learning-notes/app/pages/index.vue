@@ -11,16 +11,22 @@ const { data: nitroArticles } = await useAsyncData('nitro-list', () =>
   queryCollection('nitro').all()
 )
 
+const { data: pythonArticles } = await useAsyncData('python-list', () =>
+  queryCollection('python').all()
+)
+
 const notesCount = computed(() => notesArticles.value?.length ?? 0)
 const nuxtCount = computed(() => nuxtArticles.value?.length ?? 0)
 const nitroCount = computed(() => nitroArticles.value?.length ?? 0)
-const totalCount = computed(() => notesCount.value + nuxtCount.value + nitroCount.value)
+const pythonCount = computed(() => pythonArticles.value?.length ?? 0)
+const totalCount = computed(() => notesCount.value + nuxtCount.value + nitroCount.value + pythonCount.value)
 
 const allArticles = computed(() => {
   const all = [
     ...(notesArticles.value || []).map(a => ({ ...a, category: 'notes' })),
     ...(nuxtArticles.value || []).map(a => ({ ...a, category: 'nuxt' })),
     ...(nitroArticles.value || []).map(a => ({ ...a, category: 'nitro' })),
+    ...(pythonArticles.value || []).map(a => ({ ...a, category: 'python' })),
   ]
   return all
     .sort((a, b) => {
@@ -50,7 +56,7 @@ function getArticleDate(article: any): string {
     <section class="hero">
       <div class="container hero-content">
         <h1>我的学习空间</h1>
-        <p class="subtitle">记录学习旅程，分享技术笔记 — Nuxt、Nitro 与更多</p>
+        <p class="subtitle">记录学习旅程，分享技术笔记 — Nuxt、Nitro、Python 与更多</p>
       </div>
     </section>
 
@@ -68,6 +74,10 @@ function getArticleDate(article: any): string {
         <div class="stat-card">
           <span class="stat-number">{{ nitroCount }}</span>
           <span class="stat-label">Nitro 文档</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">{{ pythonCount }}</span>
+          <span class="stat-label">Python 文档</span>
         </div>
       </div>
 
@@ -88,6 +98,11 @@ function getArticleDate(article: any): string {
           <div class="category-icon">⚡</div>
           <h3>Nitro 学习文档</h3>
           <p>Nitro 服务端引擎学习笔记</p>
+        </NuxtLink>
+        <NuxtLink to="/python" class="category-card">
+          <div class="category-icon">🐍</div>
+          <h3>Python 学习文档</h3>
+          <p>Python 编程语言学习笔记</p>
         </NuxtLink>
       </div>
 
