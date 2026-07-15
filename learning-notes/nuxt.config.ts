@@ -9,6 +9,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
 
   app: {
+    baseURL: '/daydayup/',
     head: {
       title: '学习笔记',
       meta: [
@@ -36,6 +37,13 @@ export default defineNuxtConfig({
           },
         },
       },
+    },
+  },
+
+  nitro: {
+    prerender: {
+      routes: ['/'],
+      crawlLinks: true,
     },
   },
 })

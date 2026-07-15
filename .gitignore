@@ -27,3 +27,7 @@ npm-debug.log*
 
 # Coverage
 coverage/
+
+# Private data
+learning-notes/public/bookmarks.json
+learning-notes/server/data/bookmarks.json
