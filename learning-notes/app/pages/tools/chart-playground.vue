@@ -206,6 +206,21 @@ function shareConfig() {
   })
 }
 
+function exportOption() {
+  const option = getChartOption()
+  const json = JSON.stringify(option, null, 2)
+  const blob = new Blob([json], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  const ts = new Date().toISOString().slice(0, 10)
+  a.download = `echarts_option_${ts}.json`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
 // 加载分享的配置
 onMounted(() => {
   const params = new URLSearchParams(window.location.search)
@@ -257,6 +272,7 @@ const colors = [
         <div class="header-actions">
           <button class="btn-ghost" @click="resetConfig">重置</button>
           <button class="btn-ghost" @click="shareConfig">分享</button>
+          <button class="btn-ghost" @click="exportOption">导出配置</button>
           <button class="btn-primary" @click="exportPNG">导出 PNG</button>
           <NuxtLink to="/tools" class="back-link">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">

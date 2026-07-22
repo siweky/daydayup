@@ -15,7 +15,7 @@ let mouseY = 0
 let targetRotationX = 0
 let targetRotationY = 0
 
-const PARTICLE_COUNT = 300
+const PARTICLE_COUNT = 100
 const CONNECTION_DISTANCE = 100
 const SPREAD = 600
 
