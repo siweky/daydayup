@@ -222,12 +222,21 @@ onMounted(() => {
           <h1>书签查重</h1>
           <p>分析所有书签的 URL 地址，查找可合并的重复项</p>
         </div>
-        <NuxtLink to="/bookmarks" class="back-to-bookmarks">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          返回书签
-        </NuxtLink>
+        <div class="header-actions">
+          <NuxtLink to="/bookmarks/dedup-local" class="back-to-bookmarks local-link">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <path d="M3 14V16C3 16.5523 3.44772 17 4 17H16C16.5523 17 17 16.5523 17 16V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 3V13M10 13L6 9M10 13L14 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            本地查重
+          </NuxtLink>
+          <NuxtLink to="/bookmarks" class="back-to-bookmarks">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            返回书签
+          </NuxtLink>
+        </div>
       </div>
     </div>
 
@@ -346,6 +355,18 @@ onMounted(() => {
 .back-to-bookmarks:hover {
   color: var(--primary, #1677ff);
   border-color: var(--primary, #1677ff);
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.local-link {
+  color: var(--primary, #1677ff);
+  border-color: rgba(22, 119, 255, 0.25);
+  background: rgba(22, 119, 255, 0.04);
 }
 
 /* Stats */
