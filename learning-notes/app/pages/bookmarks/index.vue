@@ -234,8 +234,22 @@ onMounted(() => {
 <template>
   <div class="container page-container bookmarks-page">
     <div class="page-header">
-      <h1>书签收藏</h1>
-      <p>共 {{ totalBookmarks }} 个书签，分类整理便于查阅</p>
+      <div class="header-row">
+        <div>
+          <h1>书签收藏</h1>
+          <p>共 {{ totalBookmarks }} 个书签，分类整理便于查阅</p>
+        </div>
+        <NuxtLink to="/bookmarks/dedup" class="dedup-btn">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <path d="M8 3H4C3.44772 3 3 3.44772 3 4V8C3 8.55228 3.44772 9 4 9H8C8.55228 9 9 8.55228 9 8V4C9 3.44772 8.55228 3 8 3Z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M16 3H12C11.4477 3 11 3.44772 11 4V8C11 8.55228 11.4477 9 12 9H16C16.5523 9 17 8.55228 17 8V4C17 3.44772 16.5523 3 16 3Z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 11H4C3.44772 11 3 11.4477 3 12V16C3 16.5523 3.44772 17 4 17H8C8.55228 17 9 16.5523 9 16V12C9 11.4477 8.55228 11 8 11Z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M17 12V16C17 16.5523 16.5523 17 16 17H12C11.4477 17 11 16.5523 11 16V12C11 11.4477 11.4477 11 12 11H16C16.5523 11 17 11.4477 17 12Z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+          </svg>
+          书签查重
+        </NuxtLink>
+      </div>
     </div>
 
     <!-- Search Bar -->

@@ -1391,6 +1391,35 @@ html.dark .upload-status.error {
   margin-bottom: 1.5rem;
 }
 
+.bookmarks-page .header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.bookmarks-page .dedup-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--primary, #1677ff);
+  background: rgba(22, 119, 255, 0.06);
+  border: 1px solid rgba(22, 119, 255, 0.2);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+  margin-top: 0.35rem;
+}
+
+.bookmarks-page .dedup-btn:hover {
+  background: rgba(22, 119, 255, 0.12);
+  border-color: rgba(22, 119, 255, 0.4);
+  box-shadow: 0 2px 6px rgba(22, 119, 255, 0.12);
+}
+
 .bookmarks-search {
   position: relative;
   margin-bottom: 1.5rem;
