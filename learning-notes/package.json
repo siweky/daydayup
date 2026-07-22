@@ -12,6 +12,7 @@
     "@nuxt/content": "^3.14.0",
     "@types/three": "^0.185.1",
     "better-sqlite3": "^12.11.1",
+    "echarts": "^6.1.0",
     "nuxt": "^4.4.8",
     "three": "^0.185.1",
     "vue": "^3.5.35",
