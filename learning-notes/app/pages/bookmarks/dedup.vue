@@ -216,115 +216,126 @@ onMounted(() => {
 
 <template>
   <div class="container page-container dedup-page">
-    <div class="page-header">
-      <div class="header-row">
-        <div>
-          <h1>书签查重</h1>
-          <p>分析所有书签的 URL 地址，查找可合并的重复项</p>
+    <ClientOnly>
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>书签查重</h1>
+            <p>分析所有书签的 URL 地址，查找可合并的重复项</p>
+          </div>
+          <div class="header-actions">
+            <NuxtLink to="/bookmarks/dedup-local" class="back-to-bookmarks local-link">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                <path d="M3 14V16C3 16.5523 3.44772 17 4 17H16C16.5523 17 17 16.5523 17 16V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 3V13M10 13L6 9M10 13L14 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              本地查重
+            </NuxtLink>
+            <NuxtLink to="/bookmarks" class="back-to-bookmarks">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              返回书签
+            </NuxtLink>
+          </div>
         </div>
-        <div class="header-actions">
-          <NuxtLink to="/bookmarks/dedup-local" class="back-to-bookmarks local-link">
+      </div>
+
+      <!-- Loading -->
+      <div v-if="loading" class="empty-state">
+        <div class="loading-spinner"></div>
+        <p style="margin-top: 1rem; color: var(--text-muted);">正在分析书签数据...</p>
+      </div>
+
+      <template v-else>
+        <!-- Stats cards -->
+        <div class="dedup-stats">
+          <div class="stat-card">
+            <span class="stat-value">{{ stats.total }}</span>
+            <span class="stat-label">总书签数</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">{{ stats.unique }}</span>
+            <span class="stat-label">不重复</span>
+          </div>
+          <div class="stat-card highlight">
+            <span class="stat-value">{{ stats.groups }}</span>
+            <span class="stat-label">重复组</span>
+          </div>
+          <div class="stat-card warn">
+            <span class="stat-value">{{ stats.removable }}</span>
+            <span class="stat-label">可清理</span>
+          </div>
+        </div>
+
+        <!-- Action bar -->
+        <div class="dedup-action-bar">
+          <button class="export-btn" :disabled="exporting" @click="exportDeduped">
             <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
               <path d="M3 14V16C3 16.5523 3.44772 17 4 17H16C16.5523 17 17 16.5523 17 16V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M10 3V13M10 13L6 9M10 13L14 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            本地查重
-          </NuxtLink>
-          <NuxtLink to="/bookmarks" class="back-to-bookmarks">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            返回书签
-          </NuxtLink>
+            <span v-if="exporting">正在生成...</span>
+            <span v-else>导出去重书签<template v-if="stats.removable > 0">（{{ stats.total }} → {{ cleanedCount }}）</template></span>
+          </button>
         </div>
-      </div>
-    </div>
 
-    <!-- Loading -->
-    <div v-if="loading" class="empty-state">
-      <div class="loading-spinner"></div>
-      <p>正在分析书签数据...</p>
-    </div>
+        <!-- Sort controls -->
+        <div v-if="duplicateGroups.length > 0" class="dedup-controls">
+          <span class="control-label">排序方式</span>
+          <button class="sort-btn" :class="{ active: sortBy === 'count' }" @click="sortBy = 'count'">按数量</button>
+          <button class="sort-btn" :class="{ active: sortBy === 'domain' }" @click="sortBy = 'domain'">按域名</button>
+        </div>
 
-    <template v-else>
-      <!-- Stats cards -->
-      <div class="dedup-stats">
-        <div class="stat-card">
-          <span class="stat-value">{{ stats.total }}</span>
-          <span class="stat-label">总书签数</span>
+        <!-- Duplicate groups -->
+        <div v-if="sortedGroups.length > 0" class="dedup-groups">
+          <div v-for="(group, gi) in sortedGroups" :key="gi" class="dup-group">
+            <div class="dup-header">
+              <img
+                :src="getFaviconUrl(group.url)"
+                class="dup-favicon"
+                width="20" height="20"
+                alt=""
+                loading="lazy"
+                @error="($event.target as HTMLImageElement).style.display='none'"
+              />
+              <div class="dup-url-wrap">
+                <a :href="group.url" target="_blank" rel="noopener noreferrer" class="dup-url">{{ group.url }}</a>
+                <span class="dup-domain">{{ getDomain(group.url) }}</span>
+              </div>
+              <span class="dup-badge">{{ group.count }} 处</span>
+            </div>
+            <div class="dup-entries">
+              <div v-for="(entry, ei) in group.entries" :key="ei" class="dup-entry">
+                <svg class="path-icon" width="14" height="14" viewBox="0 0 20 20" fill="none">
+                  <path d="M3 7L10 2L17 7V16C17 16.5523 16.5523 17 16 17H4C3.44772 17 3 16.5523 3 16V7Z" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M8 17V11H12V17" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                <span class="dup-entry-name">{{ entry.name }}</span>
+                <span class="dup-entry-path">{{ entry.path }}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="stat-card">
-          <span class="stat-value">{{ stats.unique }}</span>
-          <span class="stat-label">不重复</span>
-        </div>
-        <div class="stat-card highlight">
-          <span class="stat-value">{{ stats.groups }}</span>
-          <span class="stat-label">重复组</span>
-        </div>
-        <div class="stat-card warn">
-          <span class="stat-value">{{ stats.removable }}</span>
-          <span class="stat-label">可清理</span>
-        </div>
-      </div>
 
-      <!-- Action bar -->
-      <div class="dedup-action-bar">
-        <button class="export-btn" :disabled="exporting" @click="exportDeduped">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-            <path d="M3 14V16C3 16.5523 3.44772 17 4 17H16C16.5523 17 17 16.5523 17 16V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M10 3V13M10 13L6 9M10 13L14 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- No duplicates -->
+        <div v-else class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="20" stroke="#52c41a" stroke-width="2.5"/>
+            <path d="M15 24L21 30L33 18" stroke="#52c41a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span v-if="exporting">正在生成...</span>
-          <span v-else>导出去重书签<template v-if="stats.removable > 0">（{{ stats.total }} → {{ cleanedCount }}）</template></span>
-        </button>
-      </div>
-
-      <!-- Sort controls -->
-      <div v-if="duplicateGroups.length > 0" class="dedup-controls">
-        <span class="control-label">排序方式</span>
-        <button class="sort-btn" :class="{ active: sortBy === 'count' }" @click="sortBy = 'count'">按数量</button>
-        <button class="sort-btn" :class="{ active: sortBy === 'domain' }" @click="sortBy = 'domain'">按域名</button>
-      </div>
-
-      <!-- Duplicate groups -->
-      <div v-if="sortedGroups.length > 0" class="dedup-groups">
-        <div v-for="(group, gi) in sortedGroups" :key="gi" class="dup-group">
-          <div class="dup-header">
-            <img
-              :src="getFaviconUrl(group.url)"
-              class="dup-favicon"
-              width="20" height="20"
-              alt=""
-              loading="lazy"
-              @error="($event.target as HTMLImageElement).style.display='none'"
-            />
-            <div class="dup-url-wrap">
-              <a :href="group.url" target="_blank" rel="noopener noreferrer" class="dup-url">{{ group.url }}</a>
-              <span class="dup-domain">{{ getDomain(group.url) }}</span>
-            </div>
-            <span class="dup-badge">{{ group.count }} 处</span>
-          </div>
-          <div class="dup-entries">
-            <div v-for="(entry, ei) in group.entries" :key="ei" class="dup-entry">
-              <svg class="path-icon" width="14" height="14" viewBox="0 0 20 20" fill="none">
-                <path d="M2 5C2 3.89543 2.89543 3 4 3H8L10 5H16C17.1046 5 18 5.89543 18 7V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="1.5"/>
-              </svg>
-              <span class="dup-entry-name">{{ entry.name }}</span>
-              <span class="dup-entry-path">{{ entry.path }}</span>
-            </div>
-          </div>
+          <p style="margin-top: 1rem; color: var(--text-muted);">没有找到重复的书签，数据很干净</p>
         </div>
-      </div>
+      </template>
 
-      <!-- No duplicates -->
-      <div v-else class="empty-state">
-        <svg class="empty-icon-svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
-          <path d="M18 24L22 28L30 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="24" cy="24" r="16" stroke="currentColor" stroke-width="2.5"/>
-        </svg>
-        <p>没有找到重复的书签，数据很干净</p>
-      </div>
-    </template>
+      <template #fallback>
+        <div class="page-header">
+          <h1>书签查重</h1>
+          <p>加载中...</p>
+        </div>
+        <div class="empty-state"><div class="loading-spinner"></div></div>
+      </template>
+    </ClientOnly>
   </div>
 </template>
 
@@ -345,7 +356,7 @@ onMounted(() => {
   font-size: 0.875rem;
   color: var(--text-secondary, #666);
   background: var(--bg-secondary, #f5f5f5);
-  border: 1px solid var(--border-color, #e0e0e0);
+  border: 1px solid var(--border);
   border-radius: 6px;
   text-decoration: none;
   transition: all 0.2s;
@@ -378,7 +389,7 @@ onMounted(() => {
 }
 .stat-card {
   background: var(--bg-secondary, #f8f9fa);
-  border: 1px solid var(--border-color, #e8e8e8);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1.25rem;
   display: flex;
@@ -449,7 +460,7 @@ onMounted(() => {
 .sort-btn {
   padding: 0.3rem 0.75rem;
   font-size: 0.8rem;
-  border: 1px solid var(--border-color, #d9d9d9);
+  border: 1px solid var(--border);
   border-radius: 4px;
   background: transparent;
   color: var(--text-secondary, #666);
@@ -471,7 +482,7 @@ onMounted(() => {
 }
 .dup-group {
   background: var(--bg-card, #fff);
-  border: 1px solid var(--border-color, #e8e8e8);
+  border: 1px solid var(--border);
   border-radius: 10px;
   overflow: hidden;
   transition: box-shadow 0.2s;
@@ -484,7 +495,7 @@ onMounted(() => {
   align-items: center;
   gap: 0.75rem;
   padding: 0.875rem 1.125rem;
-  border-bottom: 1px solid var(--border-color, #f0f0f0);
+  border-bottom: 1px solid var(--border);
 }
 .dup-favicon {
   flex-shrink: 0;
@@ -517,8 +528,8 @@ onMounted(() => {
   font-size: 0.75rem;
   font-weight: 600;
   color: #fa8c16;
-  background: #fff7e6;
-  border: 1px solid #ffe58f;
+  background: rgba(250, 140, 22, 0.08);
+  border: 1px solid rgba(250, 140, 22, 0.2);
   border-radius: 12px;
 }
 

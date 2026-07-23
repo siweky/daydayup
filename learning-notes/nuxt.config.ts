@@ -8,6 +8,26 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2024-04-03',
 
+  build: {
+    transpile: ['@ant-design/icons-vue'],
+  },
+
+  vite: {
+    optimizeDeps: {
+      include: [
+        'ant-design-vue',
+        'dayjs',
+        'dayjs/plugin/advancedFormat',
+        'dayjs/plugin/customParseFormat',
+        'dayjs/plugin/localeData',
+        'dayjs/plugin/quarterOfYear',
+        'dayjs/plugin/weekOfYear',
+        'dayjs/plugin/weekYear',
+        'dayjs/plugin/weekday',
+      ],
+    },
+  },
+
   app: {
     baseURL: '/daydayup/',
     head: {

@@ -47,7 +47,7 @@ function getCategoryLabel(cat: string): string {
 <template>
   <div class="article-card" @click="navigate">
     <div class="article-card-body">
-      <span v-if="category" class="card-category">{{ getCategoryLabel(category) }}</span>
+      <span v-if="category" class="card-badge" :class="'badge-' + category">{{ getCategoryLabel(category) }}</span>
       <h3>{{ title }}</h3>
       <p v-if="description" class="card-description">{{ description }}</p>
       <div class="card-meta">

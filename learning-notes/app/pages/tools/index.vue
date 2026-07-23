@@ -11,31 +11,34 @@ const tools = [
 
 <template>
   <div class="container page-container tools-page">
-    <div class="page-header">
-      <h1>小工具</h1>
-      <p>实用工具集合，持续更新中</p>
-    </div>
+    <ClientOnly>
+      <div class="page-header">
+        <h1>小工具</h1>
+        <p>实用工具集合，持续更新中</p>
+      </div>
 
-    <div class="tools-grid">
-      <NuxtLink v-for="tool in tools" :key="tool.to" :to="tool.to" class="tool-card">
-        <div class="tool-icon-wrap">
-          <svg v-if="tool.icon === 'chart'" width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <rect x="3" y="3" width="26" height="26" rx="4" stroke="currentColor" stroke-width="2"/>
-            <path d="M8 22L13 15L18 18L24 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="13" cy="15" r="2" fill="currentColor"/>
-            <circle cx="18" cy="18" r="2" fill="currentColor"/>
-            <circle cx="24" cy="10" r="2" fill="currentColor"/>
+      <div class="tools-grid">
+        <NuxtLink v-for="tool in tools" :key="tool.to" :to="tool.to" class="tool-card">
+          <div class="tool-icon-wrap">
+            <BarChartOutlined v-if="tool.icon === 'chart'" style="font-size: 28px" />
+          </div>
+          <div class="tool-info">
+            <h3>{{ tool.name }}</h3>
+            <p>{{ tool.description }}</p>
+          </div>
+          <svg class="tool-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
+        </NuxtLink>
+      </div>
+
+      <template #fallback>
+        <div class="page-header">
+          <h1>小工具</h1>
+          <p>加载中...</p>
         </div>
-        <div class="tool-info">
-          <h3>{{ tool.name }}</h3>
-          <p>{{ tool.description }}</p>
-        </div>
-        <svg class="tool-arrow" width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M7 5L12 10L7 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </NuxtLink>
-    </div>
+      </template>
+    </ClientOnly>
   </div>
 </template>
 

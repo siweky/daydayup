@@ -135,54 +135,60 @@ function getCategoryLabel(col: string): string {
 
 <template>
   <div class="container page-container">
-    <div v-if="page">
-      <!-- Breadcrumb -->
-      <ul class="breadcrumb">
-        <li v-for="(crumb, index) in breadcrumbs" :key="crumb.path">
-          <NuxtLink v-if="index < breadcrumbs.length - 1" :to="crumb.path">
-            {{ crumb.label }}
-          </NuxtLink>
-          <span v-else>{{ crumb.label }}</span>
-          <span v-if="index < breadcrumbs.length - 1" class="separator">/</span>
-        </li>
-      </ul>
+    <ClientOnly>
+      <div v-if="page">
+        <!-- Breadcrumb -->
+        <a-breadcrumb style="margin-bottom: 1rem">
+          <a-breadcrumb-item v-for="(crumb, index) in breadcrumbs" :key="crumb.path">
+            <NuxtLink v-if="index < breadcrumbs.length - 1" :to="crumb.path">
+              {{ crumb.label }}
+            </NuxtLink>
+            <span v-else>{{ crumb.label }}</span>
+          </a-breadcrumb-item>
+        </a-breadcrumb>
 
-      <!-- Article Header -->
-      <div class="article-header">
-        <div class="article-meta">
-          <span v-if="collectionName" class="meta-badge">
-            {{ getCategoryLabel(collectionName) }}
-          </span>
-          <span v-if="page.date">{{ page.date }}</span>
-        </div>
-        <h1>{{ page.title }}</h1>
-      </div>
-
-      <!-- Article Layout -->
-      <div class="article-layout">
-        <div class="article-content">
-          <ContentRenderer :value="page" />
-
-          <button class="back-btn" @click="goBack">
-            &larr; 返回列表
-          </button>
+        <!-- Article Header -->
+        <div class="article-header">
+          <div class="article-meta">
+            <a-tag v-if="collectionName" color="blue">
+              {{ getCategoryLabel(collectionName) }}
+            </a-tag>
+            <span v-if="page.date">{{ page.date }}</span>
+          </div>
+          <h1>{{ page.title }}</h1>
         </div>
 
-        <!-- Table of Contents -->
-        <aside v-if="tocHeadings.length > 0" class="toc-sidebar">
-          <h4>目录</h4>
-          <ul>
-            <li v-for="heading in tocHeadings" :key="heading.id">
-              <a
-                :href="`#${heading.id}`"
-                :class="{ 'depth-3': heading.depth === 3 }"
-              >
-                {{ heading.text }}
-              </a>
-            </li>
-          </ul>
-        </aside>
+        <!-- Article Layout -->
+        <div class="article-layout">
+          <div class="article-content">
+            <ContentRenderer :value="page" />
+
+            <a-button @click="goBack" style="margin-top: 2rem">
+              <template #icon><ArrowLeftOutlined /></template>
+              返回列表
+            </a-button>
+          </div>
+
+          <!-- Table of Contents -->
+          <aside v-if="tocHeadings.length > 0" class="toc-sidebar">
+            <h4>目录</h4>
+            <ul>
+              <li v-for="heading in tocHeadings" :key="heading.id">
+                <a
+                  :href="`#${heading.id}`"
+                  :class="{ 'depth-3': heading.depth === 3 }"
+                >
+                  {{ heading.text }}
+                </a>
+              </li>
+            </ul>
+          </aside>
+        </div>
       </div>
-    </div>
+
+      <template #fallback>
+        <div class="empty-state"><div class="loading-spinner"></div><p>加载中...</p></div>
+      </template>
+    </ClientOnly>
   </div>
 </template>

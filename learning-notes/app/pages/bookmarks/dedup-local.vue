@@ -21,9 +21,8 @@ const exporting = ref(false)
 const fileName = ref('')
 const fileSize = ref(0)
 const hasData = ref(false)
-const dragOver = ref(false)
 const parseError = ref('')
-
+const dragOver = ref(false)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 
 // ── URL 标准化 ──
@@ -202,7 +201,7 @@ function onFileSelect(e: Event) {
 
 function onDrop(e: DragEvent) {
   dragOver.value = false
-  const file = e.dataTransfer?.files?.[0]
+  const file = e.dataTransfer?.files[0]
   if (file) processFile(file)
 }
 
@@ -227,134 +226,144 @@ function formatSize(bytes: number): string {
 
 <template>
   <div class="container page-container dedup-page">
-    <div class="page-header">
-      <div class="header-row">
-        <div>
-          <h1>本地书签查重</h1>
-          <p>上传本地 Chrome 书签 JSON 文件，在线分析重复项并导出去重版本</p>
-        </div>
-        <div class="header-actions">
-          <NuxtLink to="/bookmarks/dedup" class="back-to-bookmarks">在线查重</NuxtLink>
-          <NuxtLink to="/bookmarks" class="back-to-bookmarks">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            返回书签
-          </NuxtLink>
-        </div>
-      </div>
-    </div>
-
-    <!-- Upload area -->
-    <div
-      v-if="!hasData"
-      class="upload-zone"
-      :class="{ 'drag-over': dragOver, 'has-error': parseError }"
-      @dragover.prevent="dragOver = true"
-      @dragleave="dragOver = false"
-      @drop.prevent="onDrop"
-      @click="fileInputRef?.click()"
-    >
-      <input ref="fileInputRef" type="file" accept=".json" hidden @change="onFileSelect" />
-      <svg class="upload-icon" width="48" height="48" viewBox="0 0 48 48" fill="none">
-        <path d="M24 32V12M24 12L16 20M24 12L32 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M8 32V38C8 39.1046 8.89543 40 10 40H38C39.1046 40 40 39.1046 40 38V32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <p class="upload-title">拖拽书签文件到此处，或点击选择</p>
-      <p class="upload-hint">支持 Chrome 书签 JSON 格式（通常为 Bookmarks 文件）</p>
-      <p v-if="parseError" class="upload-error">{{ parseError }}</p>
-    </div>
-
-    <!-- Analysis results -->
-    <template v-else>
-      <!-- File info bar -->
-      <div class="file-info-bar">
-        <div class="file-meta">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-            <path d="M4 4C4 2.89543 4.89543 2 6 2H12L16 6V16C16 17.1046 15.1046 18 14 18H6C4.89543 18 4 17.1046 4 16V4Z" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M12 2V6H16" stroke="currentColor" stroke-width="1.5"/>
-          </svg>
-          <span class="file-name">{{ fileName }}</span>
-          <span class="file-size">{{ formatSize(fileSize) }}</span>
-        </div>
-        <button class="re-upload-btn" @click="resetData">重新上传</button>
-      </div>
-
-      <!-- Stats cards -->
-      <div class="dedup-stats">
-        <div class="stat-card">
-          <span class="stat-value">{{ stats.total }}</span>
-          <span class="stat-label">总书签数</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value">{{ stats.unique }}</span>
-          <span class="stat-label">不重复</span>
-        </div>
-        <div class="stat-card highlight">
-          <span class="stat-value">{{ stats.groups }}</span>
-          <span class="stat-label">重复组</span>
-        </div>
-        <div class="stat-card warn">
-          <span class="stat-value">{{ stats.removable }}</span>
-          <span class="stat-label">可清理</span>
-        </div>
-      </div>
-
-      <!-- Action bar -->
-      <div class="dedup-action-bar">
-        <button class="export-btn" :disabled="exporting" @click="exportDeduped">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-            <path d="M3 14V16C3 16.5523 3.44772 17 4 17H16C16.5523 17 17 16.5523 17 16V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M10 3V13M10 13L6 9M10 13L14 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span v-if="exporting">正在生成...</span>
-          <span v-else>导出去重书签<template v-if="stats.removable > 0">（{{ stats.total }} → {{ cleanedCount }}）</template></span>
-        </button>
-      </div>
-
-      <!-- Sort controls -->
-      <div v-if="duplicateGroups.length > 0" class="dedup-controls">
-        <span class="control-label">排序方式</span>
-        <button class="sort-btn" :class="{ active: sortBy === 'count' }" @click="sortBy = 'count'">按数量</button>
-        <button class="sort-btn" :class="{ active: sortBy === 'domain' }" @click="sortBy = 'domain'">按域名</button>
-      </div>
-
-      <!-- Duplicate groups -->
-      <div v-if="sortedGroups.length > 0" class="dedup-groups">
-        <div v-for="(group, gi) in sortedGroups" :key="gi" class="dup-group">
-          <div class="dup-header">
-            <img
-              :src="getFaviconUrl(group.url)"
-              class="dup-favicon" width="20" height="20" alt="" loading="lazy"
-              @error="($event.target as HTMLImageElement).style.display='none'"
-            />
-            <div class="dup-url-wrap">
-              <a :href="group.url" target="_blank" rel="noopener noreferrer" class="dup-url">{{ group.url }}</a>
-              <span class="dup-domain">{{ getDomain(group.url) }}</span>
-            </div>
-            <span class="dup-badge">{{ group.count }} 处</span>
+    <ClientOnly>
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>本地书签查重</h1>
+            <p>上传本地 Chrome 书签 JSON 文件，在线分析重复项并导出去重版本</p>
           </div>
-          <div class="dup-entries">
-            <div v-for="(entry, ei) in group.entries" :key="ei" class="dup-entry">
-              <svg class="path-icon" width="14" height="14" viewBox="0 0 20 20" fill="none">
-                <path d="M2 5C2 3.89543 2.89543 3 4 3H8L10 5H16C17.1046 5 18 5.89543 18 7V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="1.5"/>
+          <div class="header-actions">
+            <NuxtLink to="/bookmarks/dedup" class="back-to-bookmarks">在线查重</NuxtLink>
+            <NuxtLink to="/bookmarks" class="back-to-bookmarks">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              <span class="dup-entry-name">{{ entry.name }}</span>
-              <span class="dup-entry-path">{{ entry.path }}</span>
-            </div>
+              返回书签
+            </NuxtLink>
           </div>
         </div>
       </div>
 
-      <!-- No duplicates -->
-      <div v-else class="empty-state">
-        <svg class="empty-icon-svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
-          <path d="M18 24L22 28L30 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="24" cy="24" r="16" stroke="currentColor" stroke-width="2.5"/>
+      <!-- Upload area -->
+      <div
+        v-if="!hasData"
+        class="upload-zone"
+        :class="{ 'drag-over': dragOver, 'has-error': parseError }"
+        @dragover.prevent="dragOver = true"
+        @dragleave="dragOver = false"
+        @drop.prevent="onDrop"
+        @click="fileInputRef?.click()"
+      >
+        <input ref="fileInputRef" type="file" accept=".json" hidden @change="onFileSelect" />
+        <svg class="upload-icon" width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <path d="M24 32V12M24 12L16 20M24 12L32 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 32V38C8 39.1046 8.89543 40 10 40H38C39.1046 40 40 39.1046 40 38V32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <p>没有找到重复的书签，数据很干净</p>
+        <p class="upload-title">拖拽书签文件到此处，或点击选择</p>
+        <p class="upload-hint">支持 Chrome 书签 JSON 格式（通常为 Bookmarks 文件）</p>
+        <p v-if="parseError" class="upload-error">{{ parseError }}</p>
       </div>
-    </template>
+
+      <!-- Analysis results -->
+      <template v-else>
+        <!-- File info bar -->
+        <div class="file-info-bar">
+          <div class="file-meta">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <path d="M4 4C4 2.89543 4.89543 2 6 2H12L16 6V16C16 17.1046 15.1046 18 14 18H6C4.89543 18 4 17.1046 4 16V4Z" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M12 2V6H16" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            <span class="file-name">{{ fileName }}</span>
+            <span class="file-size">{{ formatSize(fileSize) }}</span>
+          </div>
+          <button class="re-upload-btn" @click="resetData">重新上传</button>
+        </div>
+
+        <!-- Stats cards -->
+        <div class="dedup-stats">
+          <div class="stat-card">
+            <span class="stat-value">{{ stats.total }}</span>
+            <span class="stat-label">总书签数</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">{{ stats.unique }}</span>
+            <span class="stat-label">不重复</span>
+          </div>
+          <div class="stat-card highlight">
+            <span class="stat-value">{{ stats.groups }}</span>
+            <span class="stat-label">重复组</span>
+          </div>
+          <div class="stat-card warn">
+            <span class="stat-value">{{ stats.removable }}</span>
+            <span class="stat-label">可清理</span>
+          </div>
+        </div>
+
+        <!-- Action bar -->
+        <div class="dedup-action-bar">
+          <button class="export-btn" :disabled="exporting" @click="exportDeduped">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <path d="M3 14V16C3 16.5523 3.44772 17 4 17H16C16.5523 17 17 16.5523 17 16V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 3V13M10 13L6 9M10 13L14 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span v-if="exporting">正在生成...</span>
+            <span v-else>导出去重书签<template v-if="stats.removable > 0">（{{ stats.total }} → {{ cleanedCount }}）</template></span>
+          </button>
+        </div>
+
+        <!-- Sort controls -->
+        <div v-if="duplicateGroups.length > 0" class="dedup-controls">
+          <span class="control-label">排序方式</span>
+          <button class="sort-btn" :class="{ active: sortBy === 'count' }" @click="sortBy = 'count'">按数量</button>
+          <button class="sort-btn" :class="{ active: sortBy === 'domain' }" @click="sortBy = 'domain'">按域名</button>
+        </div>
+
+        <!-- Duplicate groups -->
+        <div v-if="sortedGroups.length > 0" class="dedup-groups">
+          <div v-for="(group, gi) in sortedGroups" :key="gi" class="dup-group">
+            <div class="dup-header">
+              <img
+                :src="getFaviconUrl(group.url)"
+                class="dup-favicon" width="20" height="20" alt="" loading="lazy"
+                @error="($event.target as HTMLImageElement).style.display='none'"
+              />
+              <div class="dup-url-wrap">
+                <a :href="group.url" target="_blank" rel="noopener noreferrer" class="dup-url">{{ group.url }}</a>
+                <span class="dup-domain">{{ getDomain(group.url) }}</span>
+              </div>
+              <span class="dup-badge">{{ group.count }} 处</span>
+            </div>
+            <div class="dup-entries">
+              <div v-for="(entry, ei) in group.entries" :key="ei" class="dup-entry">
+                <svg class="path-icon" width="14" height="14" viewBox="0 0 20 20" fill="none">
+                  <path d="M3 7L10 2L17 7V16C17 16.5523 16.5523 17 16 17H4C3.44772 17 3 16.5523 3 16V7Z" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M8 17V11H12V17" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+                <span class="dup-entry-name">{{ entry.name }}</span>
+                <span class="dup-entry-path">{{ entry.path }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No duplicates -->
+        <div v-else class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <circle cx="24" cy="24" r="20" stroke="#52c41a" stroke-width="2.5"/>
+            <path d="M15 24L21 30L33 18" stroke="#52c41a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p style="margin-top: 1rem; color: var(--text-muted);">没有找到重复的书签，数据很干净</p>
+        </div>
+      </template>
+
+      <template #fallback>
+        <div class="page-header">
+          <h1>本地书签查重</h1>
+          <p>加载中...</p>
+        </div>
+      </template>
+    </ClientOnly>
   </div>
 </template>
 
@@ -381,7 +390,7 @@ function formatSize(bytes: number): string {
   font-size: 0.875rem;
   color: var(--text-secondary, #666);
   background: var(--bg-secondary, #f5f5f5);
-  border: 1px solid var(--border-color, #e0e0e0);
+  border: 1px solid var(--border);
   border-radius: 6px;
   text-decoration: none;
   transition: all 0.2s;
@@ -394,7 +403,7 @@ function formatSize(bytes: number): string {
 
 /* Upload zone */
 .upload-zone {
-  border: 2px dashed var(--border-color, #d9d9d9);
+  border: 2px dashed var(--border);
   border-radius: 12px;
   padding: 3.5rem 2rem;
   text-align: center;
@@ -444,7 +453,7 @@ function formatSize(bytes: number): string {
   justify-content: space-between;
   padding: 0.625rem 1rem;
   background: var(--bg-secondary, #f6f8fa);
-  border: 1px solid var(--border-color, #e8e8e8);
+  border: 1px solid var(--border);
   border-radius: 8px;
   margin-bottom: 1.25rem;
 }
@@ -466,7 +475,7 @@ function formatSize(bytes: number): string {
 .re-upload-btn {
   padding: 0.3rem 0.75rem;
   font-size: 0.8rem;
-  border: 1px solid var(--border-color, #d9d9d9);
+  border: 1px solid var(--border);
   border-radius: 4px;
   background: transparent;
   color: var(--text-secondary, #666);
@@ -487,7 +496,7 @@ function formatSize(bytes: number): string {
 }
 .stat-card {
   background: var(--bg-secondary, #f8f9fa);
-  border: 1px solid var(--border-color, #e8e8e8);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1.25rem;
   display: flex;
@@ -546,7 +555,7 @@ function formatSize(bytes: number): string {
 .sort-btn {
   padding: 0.3rem 0.75rem;
   font-size: 0.8rem;
-  border: 1px solid var(--border-color, #d9d9d9);
+  border: 1px solid var(--border);
   border-radius: 4px;
   background: transparent;
   color: var(--text-secondary, #666);
@@ -560,7 +569,7 @@ function formatSize(bytes: number): string {
 .dedup-groups { display: flex; flex-direction: column; gap: 0.75rem; }
 .dup-group {
   background: var(--bg-card, #fff);
-  border: 1px solid var(--border-color, #e8e8e8);
+  border: 1px solid var(--border);
   border-radius: 10px;
   overflow: hidden;
   transition: box-shadow 0.2s;
@@ -571,7 +580,7 @@ function formatSize(bytes: number): string {
   align-items: center;
   gap: 0.75rem;
   padding: 0.875rem 1.125rem;
-  border-bottom: 1px solid var(--border-color, #f0f0f0);
+  border-bottom: 1px solid var(--border);
 }
 .dup-favicon { flex-shrink: 0; border-radius: 3px; }
 .dup-url-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.15rem; }
@@ -592,8 +601,8 @@ function formatSize(bytes: number): string {
   font-size: 0.75rem;
   font-weight: 600;
   color: #fa8c16;
-  background: #fff7e6;
-  border: 1px solid #ffe58f;
+  background: rgba(250, 140, 22, 0.08);
+  border: 1px solid rgba(250, 140, 22, 0.2);
   border-radius: 12px;
 }
 .dup-entries { padding: 0.5rem 1.125rem 0.625rem; display: flex; flex-direction: column; gap: 0.375rem; }

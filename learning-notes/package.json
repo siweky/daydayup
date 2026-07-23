@@ -9,8 +9,10 @@
     "preview": "nuxt preview"
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
     "@nuxt/content": "^3.14.0",
     "@types/three": "^0.185.1",
+    "ant-design-vue": "^4.2.6",
     "better-sqlite3": "^12.11.1",
     "echarts": "^6.1.0",
     "nuxt": "^4.4.8",

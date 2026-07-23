@@ -263,96 +263,109 @@ const colors = [
 
 <template>
   <div class="container page-container playground-page">
-    <div class="page-header">
-      <div class="header-row">
-        <div>
+    <ClientOnly>
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>图表 Playground</h1>
+            <p>调整样式参数，实时预览图表效果，满意后导出为 PNG</p>
+          </div>
+          <div class="header-actions">
+            <button class="toolbar-btn" @click="resetConfig">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 0 1 10.2-4.3L11 5h4V1l-1.6 1.6A7.9 7.9 0 0 0 .1 8H2zm12 0a6 6 0 0 1-10.2 4.3L5 11H1v4l1.6-1.6A7.9 7.9 0 0 0 15.9 8H14z" fill="currentColor"/></svg>
+              重置
+            </button>
+            <button class="toolbar-btn" @click="shareConfig">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="12" cy="3" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="4" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="13" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M5.7 9.1l4.6 2.8M10.3 4.1l-4.6 2.8" stroke="currentColor" stroke-width="1.5"/></svg>
+              分享
+            </button>
+            <button class="toolbar-btn" @click="exportOption">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 11v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2M8 2v9M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              导出配置
+            </button>
+            <button class="toolbar-btn primary" @click="exportPNG">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 11v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2M8 2v9M5 8l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              导出 PNG
+            </button>
+            <NuxtLink to="/tools" class="back-link">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              返回
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+
+      <div class="playground-layout">
+        <!-- Left: Config Panel -->
+        <aside class="config-panel">
+          <!-- Scene tabs -->
+          <a-segmented v-model:value="activeScene" :options="scenes" block style="margin-bottom: 1rem" />
+
+          <!-- Colors -->
+          <div class="config-section">
+            <h4 class="section-title">颜色设置</h4>
+            <div class="config-row" v-for="c in colors" :key="c.key">
+              <label>{{ c.label }}</label>
+              <div class="color-input-wrap">
+                <input type="color" v-model="(config as any)[c.key]" class="color-picker" />
+                <input type="text" v-model="(config as any)[c.key]" class="color-text" maxlength="7" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Font weight -->
+          <div class="config-section">
+            <h4 class="section-title">标题字重</h4>
+            <div class="weight-btn-group">
+              <button v-for="w in [400, 500, 600, 700]" :key="w" class="weight-btn" :class="{ active: config.titleWeight === w }" @click="config.titleWeight = w">{{ w }}</button>
+            </div>
+          </div>
+
+          <!-- Sliders -->
+          <div class="config-section">
+            <h4 class="section-title">布局参数</h4>
+            <div class="config-row slider-row" v-for="s in sliders" :key="s.key">
+              <label>{{ s.label }}</label>
+              <div class="slider-wrap">
+                <a-slider
+                  v-model:value="(config as any)[s.key]"
+                  :min="s.min"
+                  :max="s.max"
+                  :step="s.step"
+                  :tooltip-visible="false"
+                  style="flex: 1"
+                />
+                <span class="slider-val">{{ (config as any)[s.key] }}</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Right: Preview -->
+        <div ref="previewRef" class="preview-area">
+          <div
+            class="chart-scale-wrap"
+            :style="{
+              width: config.canvasWidth + 'px',
+              height: config.canvasHeight + 'px',
+              transform: `scale(${chartScale})`,
+              transformOrigin: 'top left',
+            }"
+          >
+            <div ref="chartRef" class="chart-container"></div>
+          </div>
+        </div>
+      </div>
+
+      <template #fallback>
+        <div class="page-header">
           <h1>图表 Playground</h1>
-          <p>调整样式参数，实时预览图表效果，满意后导出为 PNG</p>
+          <p>加载中...</p>
         </div>
-        <div class="header-actions">
-          <button class="btn-ghost" @click="resetConfig">重置</button>
-          <button class="btn-ghost" @click="shareConfig">分享</button>
-          <button class="btn-ghost" @click="exportOption">导出配置</button>
-          <button class="btn-primary" @click="exportPNG">导出 PNG</button>
-          <NuxtLink to="/tools" class="back-link">
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            返回
-          </NuxtLink>
-        </div>
-      </div>
-    </div>
-
-    <div class="playground-layout">
-      <!-- Left: Config Panel -->
-      <aside class="config-panel">
-        <!-- Scene tabs -->
-        <div class="scene-tabs">
-          <button
-            v-for="s in scenes" :key="s"
-            class="scene-tab" :class="{ active: activeScene === s }"
-            @click="activeScene = s"
-          >{{ s }}</button>
-        </div>
-
-        <!-- Colors -->
-        <div class="config-section">
-          <h4 class="section-title">颜色设置</h4>
-          <div class="config-row" v-for="c in colors" :key="c.key">
-            <label>{{ c.label }}</label>
-            <div class="color-input-wrap">
-              <input type="color" v-model="(config as any)[c.key]" class="color-picker" />
-              <input type="text" v-model="(config as any)[c.key]" class="color-text" maxlength="7" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Font weight -->
-        <div class="config-section">
-          <h4 class="section-title">标题字重</h4>
-          <div class="weight-btns">
-            <button
-              v-for="w in [400, 500, 600, 700]" :key="w"
-              class="weight-btn" :class="{ active: config.titleWeight === w }"
-              @click="config.titleWeight = w"
-            >{{ w }}</button>
-          </div>
-        </div>
-
-        <!-- Sliders -->
-        <div class="config-section">
-          <h4 class="section-title">布局参数</h4>
-          <div class="config-row slider-row" v-for="s in sliders" :key="s.key">
-            <label>{{ s.label }}</label>
-            <div class="slider-wrap">
-              <input
-                type="range"
-                v-model.number="(config as any)[s.key]"
-                :min="s.min" :max="s.max" :step="s.step"
-                class="slider"
-              />
-              <span class="slider-val">{{ (config as any)[s.key] }}</span>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Right: Preview -->
-      <div ref="previewRef" class="preview-area">
-        <div
-          class="chart-scale-wrap"
-          :style="{
-            width: config.canvasWidth + 'px',
-            height: config.canvasHeight + 'px',
-            transform: `scale(${chartScale})`,
-            transformOrigin: 'top left',
-          }"
-        >
-          <div ref="chartRef" class="chart-container"></div>
-        </div>
-      </div>
-    </div>
+      </template>
+    </ClientOnly>
   </div>
 </template>
 
@@ -372,29 +385,6 @@ const colors = [
   gap: 0.4rem;
   flex-shrink: 0;
 }
-.btn-ghost {
-  padding: 0.35rem 0.85rem;
-  font-size: 0.8rem;
-  border: 1px solid var(--border, #e0e0e0);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text-secondary, #666);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.btn-ghost:hover { border-color: var(--primary, #1677ff); color: var(--primary, #1677ff); }
-.btn-primary {
-  padding: 0.35rem 1rem;
-  font-size: 0.8rem;
-  font-weight: 500;
-  border: none;
-  border-radius: 6px;
-  background: var(--primary, #1677ff);
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.btn-primary:hover { background: #4096ff; }
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -410,6 +400,56 @@ const colors = [
   white-space: nowrap;
 }
 .back-link:hover { color: var(--primary, #1677ff); border-color: var(--primary, #1677ff); }
+
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #888);
+  background: var(--bg-secondary, #f5f5f5);
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.toolbar-btn:hover { color: var(--primary, #1677ff); border-color: var(--primary, #1677ff); }
+.toolbar-btn.primary {
+  color: #fff;
+  background: var(--primary, #1677ff);
+  border-color: var(--primary, #1677ff);
+}
+.toolbar-btn.primary:hover { background: #4096ff; border-color: #4096ff; }
+
+.weight-btn-group {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border, #d9d9d9);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.weight-btn {
+  flex: 1;
+  text-align: center;
+  padding: 0.3rem 0;
+  font-size: 0.8rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #666);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  border-right: 1px solid var(--border, #d9d9d9);
+}
+.weight-btn:last-child { border-right: none; }
+.weight-btn:hover { color: var(--primary, #1677ff); }
+.weight-btn.active {
+  background: var(--primary, #1677ff);
+  color: #fff;
+}
 
 /* ── Layout: two separate panels ── */
 .playground-layout {
@@ -430,28 +470,6 @@ const colors = [
 }
 .config-panel::-webkit-scrollbar { width: 3px; }
 .config-panel::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
-
-.scene-tabs {
-  display: flex;
-  margin-bottom: 1rem;
-  background: var(--bg-card, #fff);
-  border: 1px solid var(--border, #e0e0e0);
-  border-radius: 6px;
-  overflow: hidden;
-}
-.scene-tab {
-  flex: 1;
-  padding: 0.4rem 0;
-  font-size: 0.8rem;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary, #888);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.scene-tab + .scene-tab { border-left: 1px solid var(--border, #e8e8e8); }
-.scene-tab.active { background: var(--primary, #1677ff); color: #fff; }
-.scene-tab:hover:not(.active) { background: var(--bg-secondary, #f0f0f0); }
 
 .config-section { margin-bottom: 1.1rem; }
 .section-title {
@@ -506,43 +524,12 @@ const colors = [
   background: var(--bg-card, #fff);
 }
 
-.weight-btns { display: flex; gap: 0.3rem; }
-.weight-btn {
-  flex: 1;
-  padding: 0.3rem;
-  font-size: 0.78rem;
-  border: 1px solid var(--border, #ddd);
-  border-radius: 4px;
-  background: var(--bg-card, #fff);
-  cursor: pointer;
-  transition: all 0.15s;
-  color: var(--text-secondary, #666);
-}
-.weight-btn.active { background: var(--primary, #1677ff); color: #fff; border-color: var(--primary, #1677ff); }
-
 .slider-row { gap: 0.4rem; }
 .slider-wrap {
   flex: 1;
   display: flex;
   align-items: center;
   gap: 0.4rem;
-}
-.slider {
-  flex: 1;
-  -webkit-appearance: none;
-  height: 3px;
-  background: var(--border, #ddd);
-  border-radius: 2px;
-  outline: none;
-}
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--primary, #1677ff);
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
 .slider-val {
   font-size: 0.72rem;

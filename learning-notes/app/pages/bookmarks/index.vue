@@ -233,178 +233,179 @@ onMounted(() => {
 
 <template>
   <div class="container page-container bookmarks-page">
-    <div class="page-header">
-      <div class="header-row">
-        <div>
-          <h1>书签收藏</h1>
-          <p>共 {{ totalBookmarks }} 个书签，分类整理便于查阅</p>
+    <ClientOnly>
+      <div class="page-header">
+        <div class="header-row">
+          <div>
+            <h1>书签收藏</h1>
+            <p>共 {{ totalBookmarks }} 个书签，分类整理便于查阅</p>
+          </div>
+          <NuxtLink to="/bookmarks/dedup" class="dedup-btn">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+              <path d="M8 3H4C3.44772 3 3 3.44772 3 4V8C3 8.55228 3.44772 9 4 9H8C8.55228 9 9 8.55228 9 8V4C9 3.44772 8.55228 3 8 3Z" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M16 3H12C11.4477 3 11 3.44772 11 4V8C11 8.55228 11.4477 9 12 9H16C16.5523 9 17 8.55228 17 8V4C17 3.44772 16.5523 3 16 3Z" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 11H4C3.44772 11 3 11.4477 3 12V16C3 16.5523 3.44772 17 4 17H8C8.55228 17 9 16.5523 9 16V12C9 11.4477 8.55228 11 8 11Z" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M17 12V16C17 16.5523 16.5523 17 16 17H12C11.4477 17 11 16.5523 11 16V12C11 11.4477 11.4477 11 12 11H16C16.5523 11 17 11.4477 17 12Z" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+            </svg>
+            书签查重
+          </NuxtLink>
         </div>
-        <NuxtLink to="/bookmarks/dedup" class="dedup-btn">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-            <path d="M8 3H4C3.44772 3 3 3.44772 3 4V8C3 8.55228 3.44772 9 4 9H8C8.55228 9 9 8.55228 9 8V4C9 3.44772 8.55228 3 8 3Z" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M16 3H12C11.4477 3 11 3.44772 11 4V8C11 8.55228 11.4477 9 12 9H16C16.5523 9 17 8.55228 17 8V4C17 3.44772 16.5523 3 16 3Z" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M8 11H4C3.44772 11 3 11.4477 3 12V16C3 16.5523 3.44772 17 4 17H8C8.55228 17 9 16.5523 9 16V12C9 11.4477 8.55228 11 8 11Z" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M17 12V16C17 16.5523 16.5523 17 16 17H12C11.4477 17 11 16.5523 11 16V12C11 11.4477 11.4477 11 12 11H16C16.5523 11 17 11.4477 17 12Z" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
-          </svg>
-          书签查重
-        </NuxtLink>
       </div>
-    </div>
 
-    <!-- Search Bar -->
-    <div class="bookmarks-search">
-      <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2"/>
-        <path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-      <input
-        v-model="searchQuery"
-        type="text"
-        class="bookmarks-search-input"
-        placeholder="搜索书签名称、网址或路径..."
-      />
-      <button v-if="searchQuery" class="search-clear" @click="clearSearch">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Search Bar -->
+      <div class="bookmarks-search">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2"/>
+          <path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
-      </button>
-    </div>
-
-    <div class="bookmarks-layout" :class="{ 'sidebar-collapsed': sidebarCollapsed, 'no-sidebar': isSearchMode }">
-      <!-- Sidebar -->
-      <aside v-if="!isSearchMode" class="bookmarks-sidebar" :class="{ collapsed: sidebarCollapsed }">
-        <button class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed">
+        <input
+          v-model="searchQuery"
+          type="text"
+          class="bookmarks-search-input"
+          placeholder="搜索书签名称、网址或路径..."
+        />
+        <button v-if="searchQuery" class="search-clear" @click="clearSearch">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path v-if="!sidebarCollapsed" d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path v-else d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </button>
-        <div v-show="!sidebarCollapsed" class="sidebar-content">
-          <h3 class="sidebar-title">分类目录</h3>
-          <!-- All bookmarks root -->
-          <div
-            class="sidebar-item root-item"
-            :class="{ active: !selectedFolder }"
-            @click="selectedFolder = null"
-          >
-            <span class="expand-spacer"></span>
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-              <path d="M3 7L10 2L17 7V16C17 16.5523 16.5523 17 16 17H4C3.44772 17 3 16.5523 3 16V7Z" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M8 17V11H12V17" stroke="currentColor" stroke-width="1.5"/>
-            </svg>
-            <span>全部书签</span>
-          </div>
+      </div>
 
-          <!-- Tree items with depth -->
-          <div
-            v-for="item in sidebarTreeItems"
-            :key="item.node.id"
-            class="sidebar-item"
-            :class="{ active: selectedFolder?.id === item.node.id }"
-            :style="{ paddingLeft: (0.75 + item.depth * 1.125) + 'rem' }"
-            @click="selectFolder(item.node)"
-          >
-            <button
-              v-if="item.hasChildren"
-              class="expand-btn"
-              :class="{ expanded: item.isExpanded }"
-              @click.stop="toggleFolder(item.node)"
-            >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <span v-else class="expand-spacer"></span>
-            <svg class="folder-icon" width="18" height="18" viewBox="0 0 20 20" fill="none">
-              <path d="M2 5C2 3.89543 2.89543 3 4 3H8L10 5H16C17.1046 5 18 5.89543 18 7V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="1.5"/>
-            </svg>
-            <span class="sidebar-label">{{ item.node.name }}</span>
-            <span class="sidebar-count">{{ item.node.count }}</span>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Main Content -->
-      <div class="bookmarks-main">
-        <!-- Breadcrumb -->
-        <div v-if="selectedFolder && !isSearchMode" class="bookmarks-breadcrumb">
-          <button class="back-link" @click="goBack">
+      <div class="bookmarks-layout" :class="{ 'sidebar-collapsed': sidebarCollapsed, 'no-sidebar': isSearchMode }">
+        <!-- Sidebar -->
+        <aside v-if="!isSearchMode" class="bookmarks-sidebar" :class="{ collapsed: sidebarCollapsed }">
+          <button class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path v-if="!sidebarCollapsed" d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path v-else d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            返回
           </button>
-          <span class="breadcrumb-path">
-            <span v-for="(part, i) in breadcrumb" :key="i" class="breadcrumb-segment">
-              <span v-if="i > 0" class="breadcrumb-sep">/</span>
-              {{ part }}
-            </span>
-          </span>
-        </div>
-
-        <!-- Search mode header -->
-        <div v-if="isSearchMode" class="search-result-header">
-          <span>搜索 "{{ searchQuery }}" 找到 <strong>{{ searchResults.length }}</strong> 个结果</span>
-        </div>
-
-        <!-- Sub-folders grid (when a folder is selected) -->
-        <div v-if="selectedFolder && !isSearchMode && getFolderChildren(selectedFolder).length > 0" class="subfolder-grid">
-          <div
-            v-for="child in getFolderChildren(selectedFolder)"
-            :key="child.id"
-            class="subfolder-card"
-            @click="selectFolder(child)"
-          >
-            <svg class="subfolder-icon" width="28" height="28" viewBox="0 0 20 20" fill="none">
-              <path d="M2 5C2 3.89543 2.89543 3 4 3H8L10 5H16C17.1046 5 18 5.89543 18 7V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="1.5"/>
-            </svg>
-            <span class="subfolder-name">{{ child.name }}</span>
-            <span class="subfolder-count">{{ child.count }} 个</span>
-          </div>
-        </div>
-
-        <!-- Loading -->
-        <div v-if="loading" class="empty-state">
-          <div class="loading-spinner"></div>
-          <p>加载中...</p>
-        </div>
-
-        <!-- Bookmarks grid -->
-        <div v-else-if="currentBookmarks.length > 0" class="bookmark-grid">
-          <a
-            v-for="(bm, index) in currentBookmarks"
-            :key="index"
-            :href="bm.url || '#'"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="bookmark-card"
-          >
-            <img
-              :src="getFaviconUrl(bm.url || '')"
-              class="bookmark-favicon"
-              width="20"
-              height="20"
-              alt=""
-              loading="lazy"
-              @error="($event.target as HTMLImageElement).style.display='none'"
-            />
-            <div class="bookmark-info">
-              <span class="bookmark-name">{{ bm.name }}</span>
-              <span class="bookmark-domain">{{ getDomain(bm.url || '') }}</span>
+          <div v-show="!sidebarCollapsed" class="sidebar-content">
+            <h3 class="sidebar-title">分类目录</h3>
+            <!-- All bookmarks root -->
+            <div
+              class="sidebar-item root-item"
+              :class="{ active: !selectedFolder }"
+              @click="selectedFolder = null"
+            >
+              <span class="expand-spacer"></span>
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d="M3 7L10 2L17 7V16C17 16.5523 16.5523 17 16 17H4C3.44772 17 3 16.5523 3 16V7Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M8 17V11H12V17" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <span>全部书签</span>
             </div>
-          </a>
-        </div>
 
-        <!-- Empty -->
-        <div v-else class="empty-state">
-          <svg class="empty-icon-svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <path d="M8 12L24 4L40 12V28C40 36 32 42 24 44C16 42 8 36 8 28V12Z" stroke="currentColor" stroke-width="2.5"/>
-            <path d="M18 24L22 28L30 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <p>{{ isSearchMode ? '未找到匹配的书签' : '该目录下暂无书签' }}</p>
+            <!-- Tree items with depth -->
+            <div
+              v-for="item in sidebarTreeItems"
+              :key="item.node.id"
+              class="sidebar-item"
+              :class="{ active: selectedFolder?.id === item.node.id }"
+              :style="{ paddingLeft: (0.75 + item.depth * 1.125) + 'rem' }"
+              @click="selectFolder(item.node)"
+            >
+              <button
+                v-if="item.hasChildren"
+                class="expand-btn"
+                :class="{ expanded: item.isExpanded }"
+                @click.stop="toggleFolder(item.node)"
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M4.5 3L7.5 6L4.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <span v-else class="expand-spacer"></span>
+              <svg class="folder-icon" width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d="M2 5C2 3.89543 2.89543 3 4 3H8L10 5H16C17.1046 5 18 5.89543 18 7V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <span class="sidebar-label">{{ item.node.name }}</span>
+              <span class="sidebar-count">{{ item.node.count }}</span>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="bookmarks-main">
+          <!-- Breadcrumb -->
+          <div v-if="selectedFolder && !isSearchMode" class="bookmarks-breadcrumb">
+            <button class="back-link" @click="goBack">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              返回
+            </button>
+            <span class="breadcrumb-path">
+              <span v-for="(part, i) in breadcrumb" :key="i" class="breadcrumb-segment">
+                <span v-if="i > 0" class="breadcrumb-sep">/</span>
+                {{ part }}
+              </span>
+            </span>
+          </div>
+
+          <!-- Search mode header -->
+          <div v-if="isSearchMode" class="search-result-header">
+            <span>搜索 "{{ searchQuery }}" 找到 <strong>{{ searchResults.length }}</strong> 个结果</span>
+          </div>
+
+          <!-- Sub-folders grid (when a folder is selected) -->
+          <div v-if="selectedFolder && !isSearchMode && getFolderChildren(selectedFolder).length > 0" class="subfolder-grid">
+            <div
+              v-for="child in getFolderChildren(selectedFolder)"
+              :key="child.id"
+              class="subfolder-card"
+              @click="selectFolder(child)"
+            >
+              <svg class="subfolder-icon" width="28" height="28" viewBox="0 0 20 20" fill="none">
+                <path d="M2 5C2 3.89543 2.89543 3 4 3H8L10 5H16C17.1046 5 18 5.89543 18 7V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5Z" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <span class="subfolder-name">{{ child.name }}</span>
+              <span class="subfolder-count">{{ child.count }} 个</span>
+            </div>
+          </div>
+
+          <!-- Loading -->
+          <a-spin v-if="loading" tip="加载中..." style="display: flex; justify-content: center; padding: 3rem 0" />
+
+          <!-- Bookmarks grid -->
+          <div v-else-if="currentBookmarks.length > 0" class="bookmark-grid">
+            <a
+              v-for="(bm, index) in currentBookmarks"
+              :key="index"
+              :href="bm.url || '#'"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="bookmark-card"
+            >
+              <img
+                :src="getFaviconUrl(bm.url || '')"
+                class="bookmark-favicon"
+                width="20"
+                height="20"
+                alt=""
+                loading="lazy"
+                @error="($event.target as HTMLImageElement).style.display='none'"
+              />
+              <div class="bookmark-info">
+                <span class="bookmark-name">{{ bm.name }}</span>
+                <span class="bookmark-domain">{{ getDomain(bm.url || '') }}</span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Empty -->
+          <a-empty v-else :description="isSearchMode ? '未找到匹配的书签' : '该目录下暂无书签'" />
         </div>
       </div>
-    </div>
+
+      <template #fallback>
+        <div class="page-header">
+          <h1>书签收藏</h1>
+          <p>加载中...</p>
+        </div>
+        <div class="empty-state"><div class="loading-spinner"></div></div>
+      </template>
+    </ClientOnly>
   </div>
 </template>
