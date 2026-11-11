@@ -1,16 +1,14 @@
 ---
-title: "Plugins"
-description: "Use plugins to extend Nitro's runtime behavior and hook into lifecycle events."
+title: "插件与运行时钩子（Plugins）"
+description: "使用插件扩展 Nitro 的运行时行为，并挂接到生命周期事件。"
 category: "nitro"
 date: "2026-07-01"
 source: "https://nitro.build/guide/plugins"
 ---
 
-# Plugins
+Nitro 插件（plugins）在服务器启动时 **执行一次**，用于扩展 Nitro 的运行时行为。它们接收 `nitroApp` 上下文，可借此挂接到生命周期事件。
 
-Nitro plugins are **executed once** during server startup in order to allow extending Nitro's runtime behavior. They receive `nitroApp` context, which can be used to hook into lifecycle events.
-
-Plugins are auto-registered from the `plugins/` directory and run synchronously by file name order on the first Nitro initialization. Plugin functions themselves must be synchronous (return `void`), but the hooks they register can be async.
+插件从 `plugins/` 目录自动注册，在 Nitro 首次初始化时按文件名顺序同步执行。插件函数本身必须是同步的（返回 `void`），但其注册的钩子可以是异步的。
 
 ```ts
 // plugins/test.ts
@@ -21,7 +19,7 @@ export default definePlugin((nitroApp) => {
 })
 ```
 
-If you have plugins in another directory, you can use the `plugins` option:
+若插件位于其他目录，可使用 `plugins` 配置项：
 
 ```ts
 // nitro.config.ts
@@ -32,45 +30,45 @@ export default defineConfig({
 })
 ```
 
-## The `nitroApp` Context
+## `nitroApp` 上下文
 
-The plugin function receives a `nitroApp` object with the following properties:
+插件函数接收一个 `nitroApp` 对象，包含以下属性：
 
-| Property | Type | Description |
+| 属性 | 类型 | 说明 |
 | --- | --- | --- |
-| `hooks` | `HookableCore` | Hook system for registering lifecycle callbacks. |
-| `h3` | `H3Core` | The underlying H3 application instance. |
-| `fetch` | `(req: Request) => Response \| Promise<Response>` | The app's internal fetch handler. |
-| `captureError` | `(error: Error, context) => void` | Programmatically capture errors into the error hook pipeline. |
+| `hooks` | `HookableCore` | 用于注册生命周期回调的钩子系统。 |
+| `h3` | `H3Core` | 底层 H3 应用实例。 |
+| `fetch` | `(req: Request) => Response \| Promise<Response>` | 应用内部的 fetch 处理器。 |
+| `captureError` | `(error: Error, context) => void` | 以编程方式将错误送入错误钩子管线。 |
 
-## Nitro Runtime Hooks
+## Nitro 运行时钩子
 
-You can use Nitro hooks to extend the default runtime behaviour by registering custom functions to lifecycle events within plugins.
+你可以在插件中把自定义函数注册到生命周期事件上，借助 Nitro 运行时钩子（hooks）扩展默认的运行时行为。
 
 ```ts
 import { definePlugin } from "nitro";
 
 export default definePlugin((nitroApp) => {
   nitroApp.hooks.hook("close", async () => {
-    // Will run when nitro is being closed
+    // nitro 关闭时运行
   });
 })
 ```
 
-### Available Hooks
+### 可用钩子
 
-| Hook | Signature | Description |
+| 钩子 | 签名 | 说明 |
 | --- | --- | --- |
-| `request` | `(event: HTTPEvent) => void \| Promise<void>` | Called at the start of each request. |
-| `response` | `(res: Response, event: HTTPEvent) => void \| Promise<void>` | Called after the response is created. |
-| `error` | `(error: Error, context) => void` | Called when an error is captured. |
-| `close` | `() => void` | Called when the Nitro server is shutting down. |
+| `request` | `(event: HTTPEvent) => void \| Promise<void>` | 每个请求开始时调用。 |
+| `response` | `(res: Response, event: HTTPEvent) => void \| Promise<void>` | 响应创建后调用。 |
+| `error` | `(error: Error, context) => void` | 捕获到错误时调用。 |
+| `close` | `() => void` | Nitro 服务器关闭时调用。 |
 
-> The `NitroRuntimeHooks` interface is augmentable. Deployment presets (such as Cloudflare) can extend it with platform-specific hooks like `cloudflare:scheduled` and `cloudflare:email`.
+> `NitroRuntimeHooks` 接口可扩展。部署预设（如 Cloudflare）能用平台专属钩子为其扩充，例如 `cloudflare:scheduled` 和 `cloudflare:email`。
 
-### Unregistering Hooks
+### 注销钩子
 
-The `hook()` method returns an unregister function that can be called to remove the hook:
+`hook()` 方法返回一个注销函数，调用它即可移除该钩子：
 
 ```ts
 import { definePlugin } from "nitro";
@@ -80,14 +78,14 @@ export default definePlugin((nitroApp) => {
     // ...
   });
 
-  // Later, remove the hook
+  // 稍后移除该钩子
   unregister();
 });
 ```
 
-## Examples
+## 示例
 
-### Capturing Errors
+### 捕获错误
 
 ```ts
 import { definePlugin } from "nitro";
@@ -99,11 +97,11 @@ export default definePlugin((nitroApp) => {
 })
 ```
 
-The `context` object includes an optional `tags` array that identifies the error source (e.g., `"request"`, `"response"`, `"cache"`, `"plugin"`, `"unhandledRejection"`, `"uncaughtException"`).
+`context` 对象包含一个可选的 `tags` 数组，用于标识错误来源（例如 `"request"`、`"response"`、`"cache"`、`"plugin"`、`"unhandledRejection"`、`"uncaughtException"`）。
 
-### Programmatic Error Capture
+### 编程式捕获错误
 
-Use `captureError` to manually feed errors into the error hook pipeline:
+使用 `captureError` 手动把错误送入错误钩子管线：
 
 ```ts
 import { definePlugin } from "nitro";
@@ -115,19 +113,19 @@ export default definePlugin((nitroApp) => {
 });
 ```
 
-### Graceful Shutdown
+### 优雅关闭
 
 ```ts
 import { definePlugin } from "nitro";
 
 export default definePlugin((nitroApp) => {
   nitroApp.hooks.hook("close", async () => {
-    // Clean up resources, close connections, etc.
+    // 清理资源、关闭连接等。
   });
 });
 ```
 
-### Request and Response Lifecycle
+### 请求与响应生命周期
 
 ```ts
 import { definePlugin } from "nitro";
@@ -143,7 +141,7 @@ export default definePlugin((nitroApp) => {
 });
 ```
 
-### Modifying Response Headers
+### 修改响应头
 
 ```ts
 import { definePlugin } from "nitro";

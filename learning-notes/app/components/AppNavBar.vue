@@ -10,6 +10,7 @@ const navLinks = [
   { label: 'Nuxt', to: '/nuxt' },
   { label: 'Nitro', to: '/nitro' },
   { label: 'Python', to: '/python' },
+  { label: 'AI Agent', to: '/ai-agent' },
   { label: '书签', to: '/bookmarks' },
   { label: '小工具', to: '/tools' },
   { label: '管理', to: '/manage' },

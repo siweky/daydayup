@@ -15,11 +15,16 @@ const { data: pythonArticles } = await useAsyncData('python-list', () =>
   queryCollection('python').all()
 )
 
+const { data: aiAgentArticles } = await useAsyncData('ai-agent-list', () =>
+  queryCollection('aiAgent').all()
+)
+
 const notesCount = computed(() => notesArticles.value?.length ?? 0)
 const nuxtCount = computed(() => nuxtArticles.value?.length ?? 0)
 const nitroCount = computed(() => nitroArticles.value?.length ?? 0)
 const pythonCount = computed(() => pythonArticles.value?.length ?? 0)
-const totalCount = computed(() => notesCount.value + nuxtCount.value + nitroCount.value + pythonCount.value)
+const aiAgentCount = computed(() => aiAgentArticles.value?.length ?? 0)
+const totalCount = computed(() => notesCount.value + nuxtCount.value + nitroCount.value + pythonCount.value + aiAgentCount.value)
 
 const allArticles = computed(() => {
   const all = [
@@ -27,6 +32,7 @@ const allArticles = computed(() => {
     ...(nuxtArticles.value || []).map(a => ({ ...a, category: 'nuxt' })),
     ...(nitroArticles.value || []).map(a => ({ ...a, category: 'nitro' })),
     ...(pythonArticles.value || []).map(a => ({ ...a, category: 'python' })),
+    ...(aiAgentArticles.value || []).map(a => ({ ...a, category: 'ai-agent' })),
   ]
   return all
     .sort((a, b) => {
@@ -56,7 +62,7 @@ function getArticleDate(article: any): string {
     <section class="hero">
       <div class="container hero-content">
         <h1>我的学习空间</h1>
-        <p class="subtitle">记录学习旅程，分享技术笔记 — Nuxt、Nitro、Python 与更多</p>
+        <p class="subtitle">记录学习旅程，分享技术笔记 — Nuxt、Nitro、Python 与 AI Agent</p>
       </div>
     </section>
 
@@ -79,6 +85,10 @@ function getArticleDate(article: any): string {
           <div class="stat-card stat-python">
             <span class="stat-number">{{ pythonCount }}</span>
             <span class="stat-label">Python 文档</span>
+          </div>
+          <div class="stat-card stat-agent">
+            <span class="stat-number">{{ aiAgentCount }}</span>
+            <span class="stat-label">AI Agent 文档</span>
           </div>
         </div>
 
@@ -136,6 +146,20 @@ function getArticleDate(article: any): string {
             <div class="cat-info">
               <h3>Python 学习文档</h3>
               <p>Python 编程语言学习笔记</p>
+            </div>
+            <svg class="cat-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </NuxtLink>
+          <NuxtLink to="/ai-agent" class="category-card cat-agent">
+            <div class="cat-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="8" width="18" height="12" rx="3"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/><path d="M12 4v4"/><circle cx="12" cy="3" r="1"/>
+              </svg>
+            </div>
+            <div class="cat-info">
+              <h3>AI Agent 学习路线</h3>
+              <p>前端转型智能体开发的学习模块</p>
             </div>
             <svg class="cat-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>

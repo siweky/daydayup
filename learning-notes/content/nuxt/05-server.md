@@ -1,14 +1,12 @@
 ---
-title: "Server"
-description: "How to use the server directory to register API endpoints, middleware, plugins, and utilities in your Nuxt application."
+title: "Nuxt 服务端（server）目录"
+description: "介绍如何使用 server/ 目录在 Nuxt 应用中注册 API 端点、中间件、插件与工具函数。"
 category: "nuxt"
 date: "2026-07-01"
 source: "https://nuxt.com/docs/guide/directory-structure/server"
 ---
 
-# Server
-
-The `server/` directory allows you to register API and server handlers for your Nuxt application. Nuxt automatically scans files within this directory to register handlers with Hot Module Replacement (HMR) support.
+`server/` 目录用于为 Nuxt 应用注册 API 与服务端处理器。Nuxt 会自动扫描该目录下的文件，注册支持热模块替换（HMR）的处理器。
 
 ```text
 -| server/
@@ -20,7 +18,7 @@ The `server/` directory allows you to register API and server handlers for your 
     -----| log.ts        # log all requests
 ```
 
-Each file must export a default function using `defineEventHandler()` or its alias `eventHandler()`. Handlers can return JSON, a `Promise`, or use `event.node.res.end()` to send responses.
+每个文件都必须使用 `defineEventHandler()` 或其别名 `eventHandler()` 导出一个默认函数。处理器可以返回 JSON、`Promise`，或用 `event.node.res.end()` 发送响应。
 
 ```typescript
 // server/api/hello.ts
@@ -31,7 +29,7 @@ export default defineEventHandler((event) => {
 })
 ```
 
-You can universally call this API in your pages and components:
+可以在页面与组件中通用地调用该 API：
 
 ```vue
 <!-- app/pages/index.vue -->
@@ -44,20 +42,20 @@ const { data } = await useFetch('/api/hello')
 </template>
 ```
 
-## Server Routes
+## 服务端路由
 
-Files located in `~/server/api` automatically receive an `/api` prefix in their routing.
+位于 `~/server/api` 的文件在路由中自动带上 `/api` 前缀。
 
-To create server routes without the `/api` prefix, place them in the `~/server/routes` directory.
+要创建不带 `/api` 前缀的服务端路由，把它们放到 `~/server/routes` 目录。
 
 ```typescript
 // server/routes/hello.ts
 export default defineEventHandler(() => 'Hello World!')
 ```
 
-## Server Middleware
+## 服务端中间件
 
-Nuxt reads files in `~/server/middleware` to generate server middleware. These handlers execute before other server routes on every request, allowing you to inspect headers, log activity, or extend the request object.
+Nuxt 读取 `~/server/middleware` 中的文件生成服务端中间件。这些处理器在每次请求中都先于其他服务端路由执行，可用于检查请求头、记录日志或扩展请求对象。
 
 ```typescript
 // server/middleware/log.ts
@@ -73,9 +71,9 @@ export default defineEventHandler((event) => {
 })
 ```
 
-## Server Plugins
+## 服务端插件
 
-Files in `~/server/plugins` are automatically registered as Nitro plugins, enabling you to extend runtime behavior and hook into lifecycle events.
+`~/server/plugins` 中的文件会自动注册为 Nitro 插件，可用于扩展运行时行为并挂接生命周期事件。
 
 ```typescript
 // server/plugins/nitroPlugin.ts
@@ -84,9 +82,9 @@ export default defineNitroPlugin((nitroApp) => {
 })
 ```
 
-## Server Utilities
+## 服务端工具函数
 
-Server routes utilize `h3` and its helpful utilities. You can add custom helpers in the `~/server/utils` directory.
+服务端路由使用 `h3` 及其配套工具。可以在 `~/server/utils` 目录中添加自定义辅助函数。
 
 ```typescript
 // server/utils/handler.ts
@@ -103,22 +101,22 @@ export const defineWrappedResponseHandler = <T extends EventHandlerRequest, D> (
   })
 ```
 
-## Server Alias
+## 服务端别名
 
-The `#server` alias allows importing files from anywhere inside the `server/` directory without worrying about relative paths.
+`#server` 别名允许从 `server/` 目录内的任意位置导入文件，无需关心相对路径。
 
 ```typescript
 // server/api/users/[id]/profile.ts
 import { formatUser } from '#server/utils/formatUser'
 ```
 
-This alias is restricted to the `server/` directory and will cause errors if used in client-side code.
+该别名仅限 `server/` 目录使用，在客户端代码中使用会报错。
 
-## Recipes
+## 实用范例
 
-### Route Parameters
+### 路由参数
 
-Dynamic parameters can be defined in filenames using brackets, like `/api/hello/[name].ts`, and accessed through `event.context.params`.
+可以用方括号在文件名中定义动态参数，例如 `/api/hello/[name].ts`，并通过 `event.context.params` 访问。
 
 ```typescript
 // server/api/hello/[name].ts
@@ -128,9 +126,9 @@ export default defineEventHandler((event) => {
 })
 ```
 
-### Matching HTTP Method
+### 匹配 HTTP 方法
 
-Suffix filenames with `.get`, `.post`, `.put`, `.delete`, etc., to match specific HTTP methods.
+在文件名后加 `.get`、`.post`、`.put`、`.delete` 等后缀，以匹配特定的 HTTP 方法。
 
 ```typescript
 // server/api/test.get.ts
@@ -140,9 +138,9 @@ export default defineEventHandler(() => 'Test get handler')
 export default defineEventHandler(() => 'Test post handler')
 ```
 
-### Body Handling
+### 请求体处理
 
-Read request bodies using `readBody`.
+使用 `readBody` 读取请求体。
 
 ```typescript
 // server/api/submit.post.ts
@@ -152,7 +150,7 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
-Call it from your app:
+在应用中调用：
 
 ```vue
 <script setup lang="ts">
@@ -165,22 +163,22 @@ async function submit () {
 </script>
 ```
 
-### Query Parameters
+### 查询参数
 
-Extract query parameters using `getQuery`.
+使用 `getQuery` 提取查询参数。
 
 ```typescript
 // server/api/query.get.ts
-// Sample query /api/query?foo=bar&baz=qux
+// 示例查询 /api/query?foo=bar&baz=qux
 export default defineEventHandler((event) => {
   const query = getQuery(event)
   return { a: query.foo, b: query.baz }
 })
 ```
 
-### Error Handling
+### 错误处理
 
-To return specific error codes, throw an exception using `createError`.
+要返回指定的错误码，使用 `createError` 抛出异常。
 
 ```typescript
 // server/api/validation/[id].ts
@@ -196,9 +194,9 @@ export default defineEventHandler((event) => {
 })
 ```
 
-### Status Codes
+### 状态码
 
-Modify the response status using the `setResponseStatus` utility.
+使用 `setResponseStatus` 工具修改响应状态。
 
 ```typescript
 export default defineEventHandler((event) => {
@@ -206,9 +204,9 @@ export default defineEventHandler((event) => {
 })
 ```
 
-### Runtime Config
+### 运行时配置
 
-Access runtime configuration via `useRuntimeConfig`.
+通过 `useRuntimeConfig` 访问运行时配置。
 
 ```typescript
 // server/api/foo.ts
@@ -223,9 +221,9 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
-### Request Cookies
+### 请求 Cookie
 
-Parse incoming cookies with `parseCookies`.
+使用 `parseCookies` 解析传入的 Cookie。
 
 ```typescript
 // server/api/cookies.ts
@@ -235,9 +233,9 @@ export default defineEventHandler((event) => {
 })
 ```
 
-### Forwarding Context & Headers
+### 转发上下文与请求头
 
-Use `event.$fetch` to pass incoming headers along to internal fetch calls.
+使用 `event.$fetch` 把传入的请求头带到内部 fetch 调用中。
 
 ```typescript
 // server/api/forward.ts
@@ -246,9 +244,9 @@ export default defineEventHandler((event) => {
 })
 ```
 
-### Awaiting Promises After Response
+### 响应后等待 Promise
 
-Use `event.waitUntil` to run background tasks without delaying the client response.
+使用 `event.waitUntil` 运行后台任务，而不延迟客户端响应。
 
 ```typescript
 // server/api/background-task.ts
@@ -258,9 +256,9 @@ export default eventHandler((event) => {
 })
 ```
 
-## Server Storage
+## 服务端存储
 
-Nitro offers a cross-platform storage layer. Configure mount points via `nitro.storage` or server plugins.
+Nitro 提供跨平台的存储层。可通过 `nitro.storage` 或服务端插件配置挂载点。
 
 ```typescript
 // nuxt.config.ts
@@ -287,9 +285,9 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
-## Nested Router
+## 嵌套路由
 
-Create nested routers using `h3` utilities.
+使用 `h3` 的工具创建嵌套路由。
 
 ```typescript
 // server/api/hello/[...slug].ts

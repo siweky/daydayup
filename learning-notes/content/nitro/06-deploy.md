@@ -1,24 +1,22 @@
 ---
-title: "Deploy"
-description: "Learn how to deploy Nitro applications to various hosting providers with zero-config presets."
+title: "部署与零配置预设（Deploy）"
+description: "了解如何通过零配置预设把 Nitro 应用部署到各类托管平台。"
 category: "nitro"
 date: "2026-07-01"
 source: "https://nitro.build/guide/deploy"
 ---
 
-# Deploy
+Nitro 能从同一份代码库生成适配不同托管平台的不同输出格式。借助内置预设（preset），你几乎无需额外代码或配置，即可轻松让 Nitro 调整输出格式。
 
-Nitro can generate different output formats suitable for different hosting providers from the same code base. Using built-in presets, you can easily configure Nitro to adjust its output format with almost no additional code or configuration.
+## 默认输出
 
-## Default Output
+默认的生产输出预设是 **Node.js 服务器**。
 
-The default production output preset is **Node.js server**.
+在开发模式下运行 Nitro 时，Nitro 始终使用名为 `nitro-dev` 的特殊预设：在隔离的 Worker 环境中以 Node.js 搭配 ESM 运行，其行为尽可能贴近生产环境。
 
-When running Nitro in development mode, Nitro will always use a special preset called `nitro-dev` using Node.js with ESM in an isolated Worker environment with behavior as close as possible to the production environment.
+## 零配置平台
 
-## Zero-Config Providers
-
-When deploying to production using CI/CD, Nitro tries to automatically detect the provider environment and set the right one without any additional configuration required. Currently, the following providers can be auto-detected with zero config:
+通过 CI/CD 部署到生产环境时，Nitro 会尝试自动检测平台环境并设置合适的预设，无需任何额外配置。目前以下平台可零配置自动检测：
 
 - AWS Amplify
 - Azure
@@ -29,23 +27,23 @@ When deploying to production using CI/CD, Nitro tries to automatically detect th
 - Vercel
 - Zeabur
 
-> **Warning for Turborepo users:** Zero config detection will be interfered by its Strict Environment Mode. You may need to allow the variables explicitly or use its Loose Environment Mode (with `--env-mode=loose` flag).
+> **Turborepo 用户注意：** 零配置检测会受其严格环境模式（Strict Environment Mode）干扰。你可能需要显式放行相关变量，或改用宽松环境模式（Loose Environment Mode，使用 `--env-mode=loose` 参数）。
 
-Other built-in providers are available with an explicit preset, including Zephyr.
+其他内置平台需显式指定预设才能使用，其中包括 Zephyr。
 
-## Changing the Deployment Preset
+## 更改部署预设
 
-If you need to build Nitro against a specific provider, you can target it by defining an environment variable named `NITRO_PRESET` or `SERVER_PRESET`, or by updating your Nitro configuration or using `--preset` argument.
+若需针对特定平台构建 Nitro，可定义名为 `NITRO_PRESET` 或 `SERVER_PRESET` 的环境变量来指定，也可更新 Nitro 配置，或使用 `--preset` 参数。
 
-Using the environment variable approach is recommended for deployments depending on CI/CD.
+对于依赖 CI/CD 的部署，推荐使用环境变量方式。
 
-**Example:** Defining a `NITRO_PRESET` environment variable:
+**示例：** 定义 `NITRO_PRESET` 环境变量：
 
 ```bash
 nitro build --preset cloudflare_pages
 ```
 
-**Example:** Updating the `nitro.config.ts` file:
+**示例：** 更新 `nitro.config.ts` 文件：
 
 ```ts
 import { defineConfig } from "nitro";
@@ -55,21 +53,21 @@ export default defineConfig({
 })
 ```
 
-## Compatibility Date
+## 兼容性日期
 
-Deployment providers regularly update their runtime behavior. Nitro presets are updated to support these new features.
+部署平台会定期更新其运行时行为，Nitro 预设也随之更新以支持这些新特性。
 
-To prevent breaking existing deployments, Nitro uses compatibility dates. These dates let you lock in behavior at the project creation time. You can also opt in to future updates when ready.
+为避免破坏已有部署，Nitro 使用兼容性日期（compatibility date）。该日期可把行为锁定在项目创建之时，你也可以在未来准备好时选择加入后续更新。
 
-When you create a new project, the `compatibilityDate` is set to the current date. This setting is saved in your project's configuration.
+新建项目时，`compatibilityDate` 会被设为当前日期，该设置保存在项目配置中。
 
-You should update the compatibility date periodically. Always test your deployment thoroughly after updating.
+应定期更新兼容性日期，并在更新后务必充分测试部署。
 
-## Common Deployment Targets
+## 常见部署目标
 
 ### Node.js
 
-The default preset. Builds a standalone Node.js server:
+默认预设，构建独立的 Node.js 服务器：
 
 ```bash
 nitro build
@@ -106,9 +104,9 @@ nitro build --preset deno_server
 nitro build --preset bun
 ```
 
-### Static / Prerendered
+### 静态 / 预渲染
 
-Pre-render all routes at build time for static hosting:
+在构建时预渲染所有路由，用于静态托管：
 
 ```bash
 nitro build --preset static
@@ -116,7 +114,7 @@ nitro build --preset static
 
 ### Docker
 
-Create a Dockerfile for your Nitro application:
+为 Nitro 应用创建 Dockerfile：
 
 ```dockerfile
 FROM node:20-slim AS builder
@@ -133,9 +131,9 @@ EXPOSE 3000
 CMD ["node", ".output/server/index.mjs"]
 ```
 
-## Environment Variables
+## 环境变量
 
-Set runtime configuration via environment variables:
+通过环境变量设置运行时配置：
 
 ```ts
 // nitro.config.ts
@@ -143,23 +141,23 @@ import { defineConfig } from "nitro";
 
 export default defineConfig({
   runtimeConfig: {
-    apiSecret: '',  // Set via NUXT_API_SECRET env var
+    apiSecret: '',  // 通过 NUXT_API_SECRET 环境变量设置
     public: {
-      apiBase: '/api',  // Set via NUXT_PUBLIC_API_BASE env var
+      apiBase: '/api',  // 通过 NUXT_PUBLIC_API_BASE 环境变量设置
     },
   },
 })
 ```
 
-## Build Output
+## 构建产物
 
-The `.output/` directory contains everything needed to run your application:
+`.output/` 目录包含运行应用所需的全部内容：
 
 ```
 .output/
   server/
-    index.mjs     # Entry point
-    chunks/       # Code-split chunks
-  public/         # Static assets
-  nitro.json      # Build metadata
+    index.mjs     # 入口文件
+    chunks/       # 代码分割块
+  public/         # 静态资源
+  nitro.json      # 构建元数据
 ```

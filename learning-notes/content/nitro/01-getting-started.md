@@ -1,54 +1,52 @@
 ---
-title: "Getting Started"
-description: "Introduction to Nitro, a full-stack server framework compatible with any runtime and any deployment target."
+title: "Nitro 快速入门（Getting Started）"
+description: "Nitro 是一个兼容任意运行时与任意部署目标的全栈服务器框架。"
 category: "nitro"
 date: "2026-07-01"
 source: "https://nitro.build/guide/getting-started"
 ---
 
-# Getting Started
+Nitro 是一个全栈服务器框架（full-stack server framework），兼容任意运行时（runtime）与任意部署目标（deployment target）。
 
-Nitro is a full-stack server framework, compatible with any runtime and any deployment target.
+Nitro 为你提供生产可用的服务器，内置文件系统路由（filesystem routing）、代码分割（code-splitting），以及对存储、缓存和数据库的支持——全部与运行时无关，可部署到任意环境。
 
-Nitro gives you a production-ready server with filesystem routing, code-splitting, and built-in support for storage, caching, and databases -- all runtime-agnostic and deployable anywhere.
+## 什么是 Nitro？
 
-## What is Nitro?
+在 `routes/` 目录中创建服务器路由和 API 路由。每个文件直接映射到一个 URL 路径，其余工作——路由、代码分割和优化构建——由 Nitro 处理。
 
-Create server and API routes inside the `routes/` directory. Each file maps directly to a URL path, and Nitro handles the rest -- routing, code-splitting, and optimized builds.
+你也可以通过创建 `server.ts` 文件完全掌控服务器入口。Nitro 的高层、与运行时无关的设计让你可以选用任意 HTTP 库，例如 [Elysia](https://elysiajs.com/)、[h3](https://h3.dev) 或 [Hono](https://hono.dev)。
 
-You can also take full control of the server entry by creating a `server.ts` file. Nitro's high-level, runtime-agnostic approach lets you use any HTTP library, such as [Elysia](https://elysiajs.com/), [h3](https://h3.dev), or [Hono](https://hono.dev).
+### 性能
 
-### Performance
+Nitro 在构建时编译路由，无需运行时路由器（runtime router）。每个传入请求只加载并执行其所需的代码。这使其成为无服务器（serverless）托管的理想选择，无论项目规模多大，启动时间都接近 0 毫秒。
 
-Nitro compiles your routes at build time, removing the need for a runtime router. Only the code required to handle each incoming request is loaded and executed. This makes it ideal for serverless hosting, with near-0ms boot time regardless of project size.
+### 随处部署
 
-### Deploy Anywhere
+无需任何配置，即可将服务器构建为优化后的 `.output/` 目录，兼容 Node.js、Bun、Deno 以及众多托管平台——Cloudflare Workers、Netlify、Vercel 等。无需改动一行代码，即可利用 ESR、ISR 和 SWR 等平台特性。
 
-Build your server into an optimized `.output/` folder compatible with Node.js, Bun, Deno, and many hosting platforms without any configuration -- Cloudflare Workers, Netlify, Vercel, and more. Take advantage of platform features like ESR, ISR, and SWR without changing a single line of code.
+### 服务端渲染
 
-### Server-Side Rendering
+用你喜爱的模板引擎渲染 HTML，或直接在服务端使用 React、Vue、Svelte 等组件库。结合客户端激活（client-side hydration）实现完整的通用渲染（universal rendering）。Nitro 提供基础能力，并以渐进式方式助你达成目标。
 
-Render HTML with your favorite templating engine, or use component libraries such as React, Vue, or Svelte directly on the server. Go full universal rendering with client-side hydration. Nitro provides the foundation and a progressive approach to reach your goals.
+### 存储
 
-### Storage
+Nitro 开箱即带一个与运行时无关的键值存储（KV storage）层。它默认使用内存存储，但你可以接入 20 多种不同的驱动（FS、Redis、S3 等），把它们挂载到不同的命名空间，并在不改动代码的情况下切换。
 
-Nitro includes a runtime-agnostic key-value storage layer out of the box. It uses in-memory storage by default, but you can connect more than 20 different drivers (FS, Redis, S3, etc.), attach them to different namespaces, and swap them without changing your code.
+### 缓存
 
-### Caching
+Nitro 支持对服务器路由和服务器函数进行缓存，直接由服务器存储支撑（通过 `cache` 命名空间）。
 
-Nitro supports caching for both server routes and server functions, backed directly by the server storage (via the `cache` namespace).
+### 数据库
 
-### Database
+Nitro 还内置了 SQL 数据库。它默认使用 SQLite，但你可以用同一套 API 连接并查询 10 多种数据库（Postgres、MySQL、PGLite 等）。
 
-Nitro also includes a built-in SQL database. It defaults to SQLite, but you can connect to and query more than 10 databases (Postgres, MySQL, PGLite, etc.) using the same API.
+### 元框架基础
 
-### Meta-Framework Foundation
+Nitro 可作为构建自有元框架（meta-framework）的基础。Nuxt、SolidStart、TanStack Start 等流行框架都全部或部分地利用了 Nitro。
 
-Nitro can be used as the foundation for building your own meta-framework. Popular frameworks such as Nuxt, SolidStart, and TanStack Start fully or partially leverage Nitro.
+## 集成 Vite
 
-## Vite Integration
-
-Nitro integrates seamlessly with [Vite](https://vite.dev) as a plugin. If you're building a frontend application with Vite, adding Nitro gives you API routes, server-side rendering, and a full production server -- all built together with `vite build`.
+Nitro 可作为插件与 [Vite](https://vite.dev) 无缝集成。若你正用 Vite 构建前端应用，加入 Nitro 即可获得 API 路由、服务端渲染和完整的生产服务器——全部通过 `vite build` 一起构建。
 
 ```ts
 // vite.config.ts
@@ -60,31 +58,31 @@ export default defineConfig({
 });
 ```
 
-With Nitro, `vite build` produces an optimized `.output/` folder containing both your frontend and backend -- ready to deploy anywhere.
+借助 Nitro，`vite build` 会产出优化后的 `.output/` 目录，同时包含前端与后端——可部署到任意环境。
 
-## Create a Nitro Project
+## 创建 Nitro 项目
 
-The fastest way to create a Nitro application is using `create-nitro-app`:
+创建 Nitro 应用最快的方式是使用 `create-nitro-app`：
 
 ```bash
 npx create-nitro-app@latest
 ```
 
-Make sure to have installed the latest LTS version of either Node.js, Bun, or Deno.
+请确保已安装 Node.js、Bun 或 Deno 中任一的最新 LTS 版本。
 
-Follow the instructions from the CLI and you will be ready to start your development server.
+按照 CLI 的提示操作，即可启动开发服务器。
 
-## Add to a Vite Project
+## 添加到 Vite 项目
 
-You can add Nitro to any existing Vite project to get API routes, server-side rendering, and more.
+你可以把 Nitro 添加到任意已有的 Vite 项目，以获得 API 路由、服务端渲染等能力。
 
-### Step 1: Install `nitro` and `vite`
+### 第 1 步：安装 `nitro` 和 `vite`
 
 ```bash
 npm install nitro vite
 ```
 
-### Step 2: Add Nitro plugin to Vite
+### 第 2 步：向 Vite 添加 Nitro 插件
 
 ```ts
 // vite.config.ts
@@ -98,9 +96,9 @@ export default defineConfig({
 });
 ```
 
-### Step 3: Configure Nitro
+### 第 3 步：配置 Nitro
 
-Create a `nitro.config.ts` to configure the server directory:
+创建 `nitro.config.ts` 来配置服务器目录：
 
 ```ts
 // nitro.config.ts
@@ -111,9 +109,9 @@ export default defineConfig({
 });
 ```
 
-### Step 4: Create an API route
+### 第 4 步：创建 API 路由
 
-Create your first API route at `server/api/test.ts`:
+在 `server/api/test.ts` 创建你的第一个 API 路由：
 
 ```ts
 // server/api/test.ts
@@ -124,12 +122,12 @@ export default defineHandler(() => {
 });
 ```
 
-The file path maps directly to the route URL -- `server/api/test.ts` becomes `/api/test`.
+文件路径直接映射到路由 URL——`server/api/test.ts` 对应 `/api/test`。
 
-### Step 5: Start the development server
+### 第 5 步：启动开发服务器
 
 ```bash
 npm run dev -- --open
 ```
 
-Your API route is now accessible at `http://localhost:3000/api/test`.
+现在可通过 `http://localhost:3000/api/test` 访问你的 API 路由。

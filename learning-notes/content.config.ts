@@ -18,5 +18,9 @@ export default defineContentConfig({
       type: 'page',
       source: 'python/**',
     }),
+    aiAgent: defineCollection({
+      type: 'page',
+      source: 'ai-agent/**',
+    }),
   },
 })

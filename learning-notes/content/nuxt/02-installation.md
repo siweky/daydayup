@@ -1,37 +1,35 @@
 ---
-title: "Installation"
-description: "How to initialize a Nuxt application using web-based playgrounds or local command-line tools."
+title: "Nuxt 安装与项目初始化"
+description: "介绍如何通过在线演练场或本地命令行工具初始化 Nuxt 应用。"
 category: "nuxt"
 date: "2026-07-01"
 source: "https://nuxt.com/docs/getting-started/installation"
 ---
 
-# Installation
+通过浏览器中的在线沙箱（sandbox），或在终端里搭建本地环境，快速开始使用 Nuxt。
 
-Quickly begin your Nuxt journey using browser-based sandboxes or by setting up a local environment via your terminal.
+## 在线体验
 
-## Play Online
+如果希望不做任何本地配置、直接在浏览器里试验，可以使用在线沙箱。StackBlitz 提供了带代码编辑器与终端访问的演练场。
 
-If you prefer experimenting directly in your browser without any local setup, you can utilize an online sandbox. StackBlitz offers a playground featuring a code editor and terminal access.
+## 新建项目
 
-## New Project
+### 前置条件
 
-### Prerequisites
+开始之前，请确认已具备以下条件：
 
-Before starting, ensure you have the following:
+- **Node.js**：需要 `22.x` 或更高版本，强烈建议使用当前活跃的 LTS 版本，并始终选择偶数版本号。
+- **文本编辑器**：装有官方 Vue 扩展的 Visual Studio Code 或 WebStorm 都提供出色的开箱即用支持。
+- **终端**：执行框架命令所必需。
 
-- **Node.js**: Version `22.x` or newer is required, though using the active LTS release is highly recommended. Always select an even-numbered version.
-- **Text editor**: Visual Studio Code with the official Vue extension or WebStorm provide excellent out-of-the-box support.
-- **Terminal**: Necessary for executing framework commands.
+**补充配置说明：**
 
-**Additional Setup Notes:**
+- **WSL**：Windows 用户若遇到热模块替换（HMR）缓慢，可考虑使用 Windows Subsystem for Linux。
+- **Windows DNS**：为加快 Windows 上的浏览器加载，使用 `127.0.0.1` 代替 `localhost:3000`。
 
-- **WSL**: Windows users experiencing slow Hot Module Replacement should consider using the Windows Subsystem for Linux.
-- **Windows DNS**: For faster browser loading on Windows, use `127.0.0.1` instead of `localhost:3000`.
+### 创建新项目
 
-### Create a New Project
-
-Open your terminal and run the appropriate command for your package manager:
+打开终端，按所用的包管理器（package manager）运行对应命令：
 
 ```bash
 # npm
@@ -50,21 +48,21 @@ bun create nuxt@latest <project-name>
 deno -A npm:create-nuxt@latest <project-name>
 ```
 
-After creation, navigate into your project directory:
+创建完成后，进入项目目录：
 
 ```bash
 cd <project-name>
 ```
 
-Or open it directly in VS Code:
+或直接在 VS Code 中打开：
 
 ```bash
 code <project-name>
 ```
 
-### Development Server
+### 开发服务器
 
-Launch your application in development mode:
+以开发模式启动应用：
 
 ```bash
 # npm
@@ -83,8 +81,8 @@ bun run dev -o
 deno run dev -o
 ```
 
-A browser window will automatically open to your local development URL.
+浏览器窗口会自动打开本地开发 URL。
 
-## Next Steps
+## 后续步骤
 
-With your project successfully created, you are ready to build your application. Explore the core concepts to deepen your understanding of the framework's architecture.
+项目创建成功后，即可开始构建应用。进一步了解核心概念，加深对框架架构的理解。

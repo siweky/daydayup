@@ -39,6 +39,7 @@ function getCategoryLabel(cat: string): string {
     nuxt: 'Nuxt',
     nitro: 'Nitro',
     python: 'Python',
+    'ai-agent': 'AI Agent',
   }
   return labels[cat] || cat
 }

@@ -35,7 +35,7 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: '个人学习笔记 - Nuxt、Nitro 与技术文档整理' },
+        { name: 'description', content: '个人学习笔记 - Nuxt、Nitro、Python 与 AI Agent 技术文档整理' },
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },

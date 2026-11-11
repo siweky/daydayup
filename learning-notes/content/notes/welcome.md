@@ -1,84 +1,105 @@
 ---
 title: "欢迎来到我的学习笔记"
-description: "这是第一篇学习笔记，介绍这个网站的用途和结构"
+description: "站点结构、五个内容分类、写作规范与新增笔记的完整流程说明"
 category: "notes"
-date: "2026-07-01"
+date: "2026-11-11"
 ---
 
 # 欢迎来到我的学习笔记
 
-这是一个使用 **Nuxt 4 + Nitro** 搭建的个人学习网站，用于记录和整理我在学习前端开发过程中的各种笔记、心得和代码示例。
+这是一个用 **Nuxt 4 + Nitro + @nuxt/content v3** 搭建的个人知识站，用来把学过的东西整理成能回头查的结构化笔记。相比浏览器书签和截图，把知识用自己的话重写一遍，检索更快、记忆更牢，也更容易发现「我以为我懂了」的地方。
 
-## 为什么搭建这个网站
+## 内容分类
 
-在学习前端技术的过程中，我发现将知识点整理成结构化的笔记是一种非常高效的学习方式。相比于零散的浏览器书签和截图，一个属于自己的知识管理系统有以下优势：
+| 分类 | 目录 | 页面 | 内容 |
+|---|---|---|---|
+| 个人笔记 | `content/notes/` | `/notes` | Vue 3、TypeScript、前端工程化、浏览器与网络 |
+| Nuxt | `content/nuxt/` | `/nuxt` | 官方文档精读（01–06）+ 中文实战（结构、Content、数据获取、中间件与 SEO） |
+| Nitro | `content/nitro/` | `/nitro` | 路由、插件、存储、数据库、部署 + 架构、鉴权、缓存与错误处理的中文补充 |
+| Python | `content/python/` | `/python` | 语法到 Web 开发（01–07）+ 异步并发、与 AI Agent 的衔接（08–09） |
+| AI Agent | `content/ai-agent/` | `/ai-agent` | 面向前端转型的学习路线、技能地图、核心概念与 12 篇实战笔记 |
 
-- **便于检索**：通过分类和搜索，快速找到之前学过的知识点
-- **加深理解**：将知识用自己的语言重新组织，有助于加深记忆
-- **持续积累**：随着时间推移，形成自己的技术知识库
-- **分享交流**：可以方便地与同事和朋友分享学习成果
+此外还有：书签（`/bookmarks`）、小工具（`/tools`）、内容管理（`/manage`）。
 
-## 网站结构说明
+### 推荐阅读路径
 
-本网站的内容按照技术主题分为以下几个类别：
+- **想系统学一个框架**：先看编号系列打基础，再看中文实战篇对照本项目怎么落地。
+- **想转型 AI Agent**：从 [学习路线总览](/ai-agent/01-roadmap) 和 [必要技能地图](/ai-agent/02-skills-map) 开始，按 01→12 顺序读，每篇末尾都有可验收的动手任务。
+- **想理解这个站点本身**：[Nuxt 4 项目结构速查](/nuxt/getting-started) → [@nuxt/content v3 实战](/nuxt/content-module) → [Nitro 架构](/nitro/introduction)。
 
-| 分类 | 目录 | 说明 |
-|------|------|------|
-| **Nuxt** | `content/nuxt/` | Nuxt.js 框架相关的学习笔记，包括路由、中间件、SSR 等 |
-| **Nitro** | `content/nitro/` | Nitro 服务端引擎的学习笔记，包括 API 开发、部署等 |
-| **笔记** | `content/notes/` | 其他通用技术笔记，如 Vue 3、TypeScript、CSS 等 |
+## 技术栈
 
-每个分类下的笔记以 Markdown 文件的形式存储，文件名即为笔记的主题名称。
+| 层 | 技术 |
+|---|---|
+| 框架 | [Nuxt 4](https://nuxt.com/) + Vue 3 + TypeScript |
+| 服务端 | [Nitro](https://nitro.unjs.io/)（`server/api/`） |
+| 内容 | [@nuxt/content v3](https://content.nuxt.com/)，集合定义在 `content.config.ts` |
+| UI | Ant Design Vue、ECharts、Three.js（粒子背景） |
+| 样式 | 全局 CSS 变量 + 明暗主题、代码高亮明暗双主题 |
+| 部署 | `npm run build` → `node .output/server/index.mjs`，`app.baseURL` 为 `/daydayup/` |
 
-## 如何添加新的笔记
+## 如何添加新笔记
 
-你可以通过以下两种方式添加新笔记：
+### 方式一：直接创建文件（推荐）
 
-### 方式一：使用上传 API
+在对应分类目录下新建 `.md`，frontmatter 用统一格式：
 
-本网站提供了一个文件上传接口，可以直接通过 API 上传 `.md` 文件：
+```md
+---
+title: "文章标题"
+description: "一句话描述，会显示在卡片上"
+category: "notes"
+date: "2026-11-11"
+---
+
+## 从这里开始写正文
+
+正文从二级标题开始：详情页已经用 title 渲染了 h1，目录也只抽取 h2/h3。
+```
+
+写作约定：
+
+- `title` / `description` / `category` / `date` 四项必填，值用双引号。
+- 站内链接写绝对路径 `/notes/xxx`，不要写 `./xxx.md`（会指向不存在的 `.md` 路由）。
+- 文件名带数字前缀（如 `01-roadmap.md`），列表页即可按路径得到阅读顺序。
+- 代码示例尽量可直接运行；每篇结尾给出可验收的「动手任务」。
+
+### 方式二：通过管理页上传
+
+打开 `/daydayup/manage`，选择分类后上传 `.md` 文件即可，服务端会写入对应 `content/` 目录。也可以用接口：
 
 ```bash
-curl -X POST http://localhost:3000/api/upload \
+curl -X POST http://localhost:3000/daydayup/api/upload \
   -F "file=@my-note.md" \
   -F "category=notes"
 ```
 
-### 方式二：直接创建文件
+可选分类值：`notes`、`nuxt`、`nitro`、`python`、`ai-agent`。
 
-你也可以直接在对应的 `content/` 子目录下创建新的 `.md` 文件。文件格式如下：
+> 管理接口具备写/删文件能力，目前只适合本地或内网使用；若部署到公网，务必先加鉴权、限流与审计，见 [Nitro 中间件与鉴权](/nitro/07-middleware-and-auth)。
 
-```markdown
----
-title: "笔记标题"
-description: "笔记描述"
-category: "notes"
-date: "2026-07-01"
----
+### 新增一个分类要改哪些地方
 
-# 笔记标题
+只建目录不够，站点层有 6 处联动（完整说明见 [Content 模块实战](/nuxt/content-module)）：
 
-正文内容...
-```
+1. `content.config.ts` 增加集合定义
+2. `content/<目录>/` 写 Markdown
+3. `app/pages/<目录>.vue` 列表页
+4. `app/pages/[...slug].vue` 路径段 → 集合键映射
+5. 导航、首页统计与分类卡、卡片徽标、CSS 配色
+6. 管理页/文件列举/上传接口的分类白名单
 
-每个文件顶部需要包含 YAML frontmatter 元数据，用于定义笔记的标题、描述、分类和日期。
+## 已经实现 / 下一步
 
-## 技术栈
+**已实现**：分类浏览与统计、文章详情与目录（TOC）、明暗主题、代码高亮、全文搜索框（UI）、书签管理、图表工具、Markdown 上传与删除、首页最近更新聚合、预渲染与 payload。
 
-本网站使用了以下技术构建：
+**下一步**：
 
-- **[Nuxt 4](https://nuxt.com/)**：基于 Vue 3 的全栈框架，提供服务端渲染和静态生成能力
-- **[Nitro](https://nitro.unjs.io/)**：Nuxt 的服务端引擎，用于构建 API 和服务端逻辑
-- **[@nuxt/content](https://content.nuxt.com/)**：Nuxt 内容模块，支持从 Markdown 文件生成页面
-- **[Vue 3](https://vuejs.org/)**：渐进式 JavaScript 框架，提供响应式 UI 组件系统
-- **[TypeScript](https://www.typescriptlang.org/)**：JavaScript 的类型超集，提供静态类型检查
+- 搜索框接上真实的全站检索（目前只有 UI）
+- 给文章加标签/系列/难度，并在列表页做筛选
+- 详情页补 `useSeoMeta`，让每篇文章有独立标题与描述
+- 给管理接口补鉴权、限流与操作审计
+- 用脚本枚举文章路径生成 `prerender.routes`，实现全站静态化
+- 把 `content/` 目录本身做成 RAG 知识库（正好是 [项目 3](/ai-agent/12-projects-and-resources) 的练手素材）
 
-## 后续计划
-
-- 添加标签系统，支持更细粒度的分类
-- 实现全文搜索功能
-- 添加代码高亮和交互式代码示例
-- 支持笔记之间的相互链接和引用
-- 添加暗黑模式切换
-
-感谢访问，希望这些笔记对你也有所帮助！
+笔记站最好的用法，是一边学一边把它改得更好用。

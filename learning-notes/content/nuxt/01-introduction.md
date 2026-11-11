@@ -1,61 +1,59 @@
 ---
-title: "Introduction"
-description: "An overview of the Nuxt framework, its automation features, server-side rendering benefits, and core architecture."
+title: "Nuxt 框架概述与核心架构"
+description: "概述 Nuxt 框架的自动化特性、服务端渲染（SSR）优势与核心架构。"
 category: "nuxt"
 date: "2026-07-01"
 source: "https://nuxt.com/docs/getting-started/introduction"
 ---
 
-# Introduction
+Nuxt 旨在让 Web 开发直观且高性能，同时优先保证出色的开发者体验。它是一个免费、开源的框架，帮助你使用 Vue.js 构建类型安全、生产级的全栈（full-stack）应用与网站。
 
-Nuxt aims to make web development intuitive and performant while prioritizing an excellent developer experience. It is a free, open-source framework designed to help you build type-safe, production-grade full-stack applications and websites using Vue.js.
+开发者可以直接开始编写 `.vue` 文件，在开发阶段享受热模块替换（HMR），并通过默认开启的服务端渲染（SSR）获得生产环境的性能。此外，框架避免厂商锁定，可部署到任意环境，包括边缘网络。
 
-Developers can immediately start writing `.vue` files, benefiting from hot module replacement during development and default server-side rendering for production performance. Furthermore, the framework prevents vendor lock-in, enabling deployment anywhere, including edge networks.
+## 自动化与约定
 
-## Automation and Conventions
+框架用一套有明确主张的目录结构和约定把重复劳动自动化，让开发者专注于功能开发。默认行为仍可通过配置文件自定义。
 
-The framework utilizes an opinionated directory structure and conventions to automate repetitive tasks, letting developers concentrate on building features. You can still customize default behaviors via the configuration file.
+- **文件路由（file-based routing）：** 路由由目录结构决定，简化组织方式，免去手工配置路由。
+- **代码分割（code splitting）：** 代码自动拆分为更小的块，缩短首屏加载时间。
+- **开箱即用的服务端渲染：** 内置 SSR 能力，无需单独配置服务器。
+- **自动导入（auto-imports）：** Vue 组合式函数（composables）与组件可直接从对应目录使用，无需手工导入，同时保证摇树优化（tree-shaking）与优化后的打包体积。
+- **数据获取工具：** 提供兼容 SSR 的数据获取组合式函数与多种策略。
+- **零配置 TypeScript 支持：** 自动生成的类型与配置文件让类型安全的代码易于编写。
+- **预置构建工具：** 默认使用 Vite 提供热模块替换与生产打包，并内置最佳实践。
 
-- **File-based routing:** Routes are defined by your directory structure, simplifying organization and removing manual route setup.
-- **Code splitting:** Your code is automatically divided into smaller chunks to decrease initial load times.
-- **Server-side rendering out of the box:** Built-in SSR capabilities eliminate the need to configure a separate server.
-- **Auto-imports:** Vue composables and components can be used directly from their directories without manual imports, ensuring tree-shaking and optimized bundles.
-- **Data-fetching utilities:** Composables are provided for SSR-compatible data fetching and various strategies.
-- **Zero-config TypeScript support:** Auto-generated types and configuration files allow you to write type-safe code easily.
-- **Configured build tools:** Vite is used by default to provide hot module replacement and production bundling with baked-in best practices.
+## 服务端渲染
 
-## Server-Side Rendering
+Nuxt 默认内置 SSR 能力，带来诸多优势：
 
-Nuxt includes built-in SSR capabilities by default, offering numerous advantages:
+- **更快的首屏加载：** 浏览器立即收到完整渲染的 HTML，改善感知加载速度。
+- **更利于搜索引擎优化（SEO）：** HTML 内容即时可用，搜索引擎能更有效地索引页面。
+- **低性能设备上表现更好：** 减少客户端 JavaScript 执行，让难以承担重负载的设备受益。
+- **更好的可访问性：** 内容即时可用，改善依赖屏幕阅读器的用户体验。
+- **更易缓存：** 服务端缓存进一步提升性能。
 
-- **Faster initial page load time:** Browsers receive fully rendered HTML immediately, improving perceived load times.
-- **Improved SEO:** Search engines can index pages more effectively since HTML content is instantly available.
-- **Better performance on low-powered devices:** Reducing client-side JavaScript execution benefits devices that struggle with heavy processing.
-- **Better accessibility:** Immediate content availability enhances the experience for users relying on screen readers.
-- **Easier caching:** Server-side caching further boosts performance.
+由于框架足够灵活，你可以对应用做静态渲染、全局关闭 SSR，或借助路由规则启用混合渲染（hybrid rendering）。
 
-Because the framework is versatile, you can statically render your application, disable SSR globally, or use hybrid rendering via route rules.
+### 服务端引擎
 
-### Server Engine
+Nitro 服务端引擎解锁了高级的全栈能力。开发期间，它借助 Rollup 与 Node.js worker 实现上下文隔离并运行服务端代码；同时通过读取特定目录，自动生成服务端 API 与中间件。
 
-The Nitro server engine unlocks advanced full-stack capabilities. During development, it utilizes Rollup and Node.js workers for context isolation and server code. It also automatically generates your server API and middleware by reading specific directories.
+面向生产，Nitro 会把应用与服务端编译进一个轻量的输出目录。这份压缩后的产物移除了 Node.js 模块（polyfill 除外），可部署到任何支持 JavaScript 的系统，包括无服务器、边缘或静态环境。
 
-For production, Nitro compiles your application and server into a single, lightweight output directory. This minified output removes Node.js modules (excluding polyfills) and can be deployed on any JavaScript-supporting system, including serverless, edge, or static environments.
+### 生产就绪
 
-### Production-ready
+应用可部署到 Node 或 Deno 服务器，预渲染后用于静态托管，或推送到无服务器与边缘平台。
 
-Applications can be deployed on Node or Deno servers, pre-rendered for static hosting, or pushed to serverless and edge providers.
+### 模块化
 
-### Modular
+完善的模块系统让你可以用自定义功能与第三方服务集成来扩展框架。
 
-A robust module system enables you to extend the framework with custom features and third-party service integrations.
+### 架构
 
-### Architecture
+框架由若干核心包组成：
 
-The framework consists of several core packages:
-
-- **Core engine:** The main package powering the framework.
-- **Bundlers:** Support for Vite, Rspack, and Webpack.
-- **Command line interface:** The official CLI tool.
-- **Server engine:** Powered by Nitro.
-- **Development kit:** Utilities for module and plugin authors.
+- **核心引擎：** 驱动框架的主包。
+- **打包器：** 支持 Vite、Rspack 与 Webpack。
+- **命令行界面（CLI）：** 官方命令行工具。
+- **服务端引擎：** 由 Nitro 驱动。
+- **开发工具包：** 面向模块与插件作者的工具集。

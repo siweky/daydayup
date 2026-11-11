@@ -587,7 +587,7 @@ tr:hover td {
 /* ===== Stats Section ===== */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
   margin: 2rem 0;
 }
@@ -670,7 +670,7 @@ html.dark .stat-python .stat-number { color: #a78bfa; }
 /* ===== Category Cards ===== */
 .category-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   margin: 1.5rem 0;
 }
@@ -776,6 +776,22 @@ html.dark .cat-python:hover .cat-arrow { color: #a78bfa; }
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== AI Agent 模块配色 ===== */
+.stat-agent { border-left-color: #0284c7; }
+.stat-agent .stat-number { color: #0284c7; }
+.stat-agent:hover { border-color: #0284c7; border-left-color: #0284c7; }
+html.dark .stat-agent { border-left-color: #38bdf8; }
+html.dark .stat-agent .stat-number { color: #38bdf8; }
+
+.cat-agent .cat-icon { background: rgba(14, 165, 233, 0.12); color: #0284c7; }
+.cat-agent:hover { border-color: rgba(14, 165, 233, 0.4); }
+.cat-agent:hover .cat-arrow { color: #0284c7; }
+html.dark .cat-agent .cat-icon { color: #38bdf8; }
+html.dark .cat-agent:hover .cat-arrow { color: #38bdf8; }
+
+.card-badge.badge-ai-agent { background: rgba(14, 165, 233, 0.12); color: #0284c7; }
+html.dark .card-badge.badge-ai-agent { color: #38bdf8; }
 
 /* ===== Section Title ===== */
 .section-title {

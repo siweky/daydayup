@@ -1,20 +1,18 @@
 ---
-title: "Database"
-description: "Nitro provides a built-in and lightweight SQL database layer with support for SQLite, PostgreSQL, MySQL, and more."
+title: "内置 SQL 数据库（Database）"
+description: "Nitro 提供内置轻量级 SQL 数据库层，支持 SQLite、PostgreSQL、MySQL 等。"
 category: "nitro"
 date: "2026-07-01"
 source: "https://nitro.build/guide/database"
 ---
 
-# Database
+Nitro 提供内置的轻量级 SQL 数据库层（SQL database layer）。
 
-Nitro provides a built-in and lightweight SQL database layer.
+默认数据库连接已 **预配置** 为 SQLite，在开发模式及任意兼容 Node.js 的生产部署中开箱即用。数据默认存储于 `.data/db.sqlite`。
 
-The default database connection is **preconfigured** with SQLite and works out of the box for development mode and any Node.js compatible production deployments. By default, data will be stored in `.data/db.sqlite`.
+> **重要：** 数据库支持目前处于实验阶段。状态与缺陷报告请参阅 [db0 issues](https://github.com/unjs/db0/issues)。
 
-> **Important:** Database support is currently experimental. Refer to the [db0 issues](https://github.com/unjs/db0/issues) for status and bug reports.
-
-To enable the database layer, you need to enable the experimental feature flag:
+要启用数据库层，需开启实验性功能标志：
 
 ```ts
 // nitro.config.ts
@@ -27,9 +25,9 @@ export default defineConfig({
 })
 ```
 
-> You can change the default connection or define more connections to any of the supported databases. You can also integrate the database instance with any of the supported ORMs.
+> 你可以更改默认连接，或为任一受支持的数据库定义更多连接。也可以把数据库实例与任一受支持的 ORM 集成。
 
-## Usage
+## 用法
 
 ```ts
 // server.ts
@@ -39,15 +37,15 @@ import { useDatabase } from "nitro/database";
 export default defineHandler(async () => {
   const db = useDatabase();
 
-  // Create users table
+  // 创建 users 表
   await db.sql`DROP TABLE IF EXISTS users`;
   await db.sql`CREATE TABLE IF NOT EXISTS users ("id" TEXT PRIMARY KEY, "firstName" TEXT, "lastName" TEXT, "email" TEXT)`;
 
-  // Add a new user
+  // 添加一个新用户
   const userId = String(Math.round(Math.random() * 10_000));
   await db.sql`INSERT INTO users VALUES (${userId}, 'John', 'Doe', '')`;
 
-  // Query for users
+  // 查询用户
   const { rows } = await db.sql`SELECT * FROM users WHERE id = ${userId}`;
 
   return {
@@ -58,44 +56,44 @@ export default defineHandler(async () => {
 
 ### `useDatabase`
 
-Use `useDatabase` to get a database instance. It accepts an optional connection name (defaults to `"default"`).
+使用 `useDatabase` 获取数据库实例。它接受可选的连接名（默认 `"default"`）。
 
 ```ts
 import { useDatabase } from "nitro/database";
 
-// Use the default connection
+// 使用默认连接
 const db = useDatabase();
 
-// Use a named connection
+// 使用命名连接
 const usersDb = useDatabase("users");
 ```
 
-> When `experimental.database` is enabled, `useDatabase` is auto-imported and available without an explicit import statement.
+> 启用 `experimental.database` 后，`useDatabase` 会被自动导入，无需显式 import 语句即可使用。
 
-Database instances are created lazily on first use and cached for subsequent calls with the same connection name. If a connection name is not configured, an error will be thrown.
+数据库实例在首次使用时惰性创建，并对同名连接的后续调用进行缓存。若连接名未配置，将抛出错误。
 
 ### `db.sql`
 
-Execute SQL queries using tagged template literals with automatic parameter binding:
+使用带自动参数绑定的标签模板字面量执行 SQL 查询：
 
 ```ts
 const db = useDatabase();
 
-// Insert with parameterized values (safe from SQL injection)
+// 使用参数化值插入（防 SQL 注入）
 const id = "1001";
 await db.sql`INSERT INTO users VALUES (${id}, 'John', 'Doe', 'john@example.com')`;
 
-// Query with parameters
+// 带参数查询
 const { rows } = await db.sql`SELECT * FROM users WHERE id = ${id}`;
 
-// Result includes rows, changes count, and last insert ID
+// 结果包含 rows、变更数与最后插入 ID
 const result = await db.sql`INSERT INTO posts (title) VALUES (${"Hello"})`;
 // result.rows, result.changes, result.lastInsertRowid
 ```
 
 ### `db.exec`
 
-Execute a raw SQL string directly:
+直接执行原生 SQL 字符串：
 
 ```ts
 const db = useDatabase();
@@ -105,7 +103,7 @@ await db.exec("CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, name TEXT)
 
 ### `db.prepare`
 
-Prepare an SQL statement for repeated execution:
+预编译 SQL 语句以便重复执行：
 
 ```ts
 const db = useDatabase();
@@ -114,9 +112,9 @@ const stmt = db.prepare("SELECT * FROM users WHERE id = ?");
 const result = await stmt.bind("1001").all();
 ```
 
-## Configuration
+## 配置
 
-You can configure database connections using `database` config:
+可使用 `database` 配置来配置数据库连接：
 
 ```ts
 // nitro.config.ts
@@ -138,9 +136,9 @@ export default defineConfig({
 });
 ```
 
-### Development Database
+### 开发期数据库
 
-Use the `devDatabase` config to override the database configuration **only for development mode**. This is useful for using a local SQLite database during development while targeting a different database in production.
+使用 `devDatabase` 配置 **仅在开发模式下** 覆盖数据库配置。这适用于开发时使用本地 SQLite 数据库、而生产环境面向另一种数据库的场景。
 
 ```ts
 // nitro.config.ts
@@ -164,26 +162,26 @@ export default defineConfig({
 });
 ```
 
-> When `experimental.database` is enabled and no `database` or `devDatabase` config is provided, Nitro automatically configures a default SQLite connection. In development mode, data is stored relative to the project root directory.
+> 启用 `experimental.database` 且未提供 `database` 或 `devDatabase` 配置时，Nitro 会自动配置默认的 SQLite 连接。在开发模式下，数据存储在项目根目录的相对路径下。
 
-## Connectors
+## 连接器
 
-Nitro supports all [db0 connectors](https://db0.unjs.io/connectors). The `connector` field accepts any of the following:
+Nitro 支持所有 [db0 connectors](https://db0.unjs.io/connectors)。`connector` 字段可接受以下任一连接器（connector）值：
 
-| Connector | Description |
+| 连接器 | 说明 |
 |---|---|
-| `sqlite` | Node.js built-in SQLite (alias for `node-sqlite`) |
-| `node-sqlite` | Node.js built-in SQLite |
+| `sqlite` | Node.js 内置 SQLite（`node-sqlite` 的别名） |
+| `node-sqlite` | Node.js 内置 SQLite |
 | `better-sqlite3` | [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) |
 | `sqlite3` | [sqlite3](https://github.com/TryGhost/node-sqlite3) |
-| `bun` / `bun-sqlite` | Bun built-in SQLite |
-| `libsql` / `libsql-node` | libSQL (Node.js) |
-| `libsql-http` | libSQL over HTTP |
-| `libsql-web` | libSQL for web environments |
+| `bun` / `bun-sqlite` | Bun 内置 SQLite |
+| `libsql` / `libsql-node` | libSQL（Node.js） |
+| `libsql-http` | 基于 HTTP 的 libSQL |
+| `libsql-web` | 面向 Web 环境的 libSQL |
 | `postgresql` | PostgreSQL |
 | `mysql2` | MySQL |
-| `pglite` | PGlite (embedded PostgreSQL) |
-| `planetscale` | PlanetScale serverless |
+| `pglite` | PGlite（嵌入式 PostgreSQL） |
+| `planetscale` | PlanetScale 无服务器 |
 | `cloudflare-d1` | Cloudflare D1 |
-| `cloudflare-hyperdrive-mysql` | Cloudflare Hyperdrive with MySQL |
-| `cloudflare-hyperdrive-postgresql` | Cloudflare Hyperdrive with PostgreSQL |
+| `cloudflare-hyperdrive-mysql` | 搭配 MySQL 的 Cloudflare Hyperdrive |
+| `cloudflare-hyperdrive-postgresql` | 搭配 PostgreSQL 的 Cloudflare Hyperdrive |

@@ -1,26 +1,24 @@
 ---
-title: "Runtime Config"
-description: "How to use the Nuxt runtime config API to manage and expose configuration variables and secrets in your application."
+title: "Nuxt 运行时配置（runtimeConfig）"
+description: "介绍如何使用 Nuxt 运行时配置 API 在应用中管理与暴露配置变量及密钥。"
 category: "nuxt"
 date: "2026-07-01"
 source: "https://nuxt.com/docs/guide/going-further/runtime-config"
 ---
 
-# Runtime Config
+Nuxt 提供运行时配置（runtime config）API，让你在应用中安全地暴露密钥与设置。
 
-Nuxt offers an API for runtime configuration, allowing you to safely expose secrets and settings throughout your application.
+## 暴露配置
 
-## Exposing
-
-To make environment variables and configuration settings available to your application, define them in the `nuxt.config` file utilizing the `runtimeConfig` property.
+要让环境变量（environment variables）与配置项在应用中可用，需在 `nuxt.config` 文件中通过 `runtimeConfig` 属性定义它们。
 
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
   runtimeConfig: {
-    // The private keys which are only available within server-side
+    // 仅在服务端可用的私有键
     apiSecret: '123',
-    // Keys within public, will be also exposed to the client-side
+    // public 中的键也会暴露给客户端
     public: {
       apiBase: '/api',
     },
@@ -28,7 +26,7 @@ export default defineNuxtConfig({
 })
 ```
 
-By placing `apiBase` inside `runtimeConfig.public`, Nuxt injects it into every page payload, making it universally accessible on both the server and the browser.
+把 `apiBase` 放进 `runtimeConfig.public` 后，Nuxt 会把它注入每个页面的载荷，使其在服务端与浏览器中都可访问。
 
 ```ts
 const runtimeConfig = useRuntimeConfig()
@@ -37,28 +35,28 @@ console.log(runtimeConfig.apiSecret)
 console.log(runtimeConfig.public.apiBase)
 ```
 
-You can also access public runtime configuration directly inside Vue templates via `$config.public`.
+也可以在 Vue 模板中通过 `$config.public` 直接访问公开的运行时配置。
 
-### Serialization
+### 序列化
 
-Before reaching Nitro, your runtime configuration undergoes serialization. Consequently, avoid placing non-serializable data types like functions, Maps, or Sets inside your `nuxt.config`.
+运行时配置在到达 Nitro 之前会经过序列化。因此，避免在 `nuxt.config` 中放入函数、Map、Set 等不可序列化的数据类型。
 
-For non-serializable objects or functions, utilize a Nitro or Nuxt middleware/plugin instead of passing them through the configuration file.
+对于不可序列化的对象或函数，改用 Nitro 或 Nuxt 的中间件/插件，不要通过配置文件传递。
 
-### Environment Variables
+### 环境变量
 
-Using environment variables is the standard method for supplying configuration settings.
+使用环境变量是提供配置项的标准方式。
 
-While the Nuxt CLI automatically reads `.env` files during development, building, and generating, **your `.env` file will not be read** when executing the compiled production server.
+Nuxt CLI 在开发、构建与生成期间会自动读取 `.env` 文件，但执行编译后的生产服务器时，**不会读取你的 `.env` 文件**。
 
-At runtime, config values are **automatically replaced by matching environment variables at runtime**.
+运行时，配置值会**被匹配的环境变量自动替换**。
 
-This process requires two main conditions:
+这一机制需要满足两个主要条件：
 
-1. Variables must exist within your `nuxt.config` to prevent arbitrary environment variables from leaking into your codebase.
-2. Overrides require specifically formatted environment variables: they must be uppercase, begin with `NUXT_`, and use underscores to delineate keys and case shifts.
+1. 变量必须存在于 `nuxt.config` 中，以防止任意环境变量泄漏到代码库。
+2. 覆盖需要使用特定格式的环境变量：必须全大写、以 `NUXT_` 开头，并用下划线分隔键名与大小写转换。
 
-#### Example
+#### 示例
 
 ```env
 # .env
@@ -78,16 +76,16 @@ export default defineNuxtConfig({
 })
 ```
 
-## Reading
+## 读取配置
 
-### Vue App
+### Vue 应用
 
-To retrieve runtime configuration inside the Vue portion of your application, invoke the `useRuntimeConfig()` composable.
+要在应用的 Vue 部分获取运行时配置，调用 `useRuntimeConfig()` 组合式函数。
 
-Client and server environments handle this differently:
+客户端与服务端的处理方式不同：
 
-- **Client-side:** Only `runtimeConfig.public` and `runtimeConfig.app` are exposed. The resulting object is reactive and writable.
-- **Server-side:** The complete configuration object is accessible but remains read-only to prevent context leakage.
+- **客户端：** 只暴露 `runtimeConfig.public` 与 `runtimeConfig.app`，得到的对象是响应式且可写的。
+- **服务端：** 可访问完整的配置对象，但为只读，以防上下文泄漏。
 
 ```vue
 <!-- app/pages/index.vue -->
@@ -102,11 +100,11 @@ if (import.meta.server) {
 </script>
 ```
 
-> **Security warning:** Never expose sensitive server-side keys to the client by rendering them in templates or passing them into `useState`.
+> **安全警告：** 切勿把敏感的服务端密钥渲染到模板或传入 `useState`，从而暴露给客户端。
 
-### Plugins
+### 插件
 
-To utilize configuration settings inside custom plugins, call `useRuntimeConfig()` within the `defineNuxtPlugin` callback.
+要在自定义插件中使用配置项，在 `defineNuxtPlugin` 回调里调用 `useRuntimeConfig()`。
 
 ```ts
 // app/plugins/config.ts
@@ -116,9 +114,9 @@ export default defineNuxtPlugin((nuxtApp) => {
 })
 ```
 
-### Server Routes
+### 服务端路由
 
-Server API routes can also access these settings via the `useRuntimeConfig` utility.
+服务端 API 路由也可通过 `useRuntimeConfig` 工具访问这些设置。
 
 ```ts
 // server/api/test.ts
@@ -135,9 +133,9 @@ export default defineEventHandler(async (event) => {
 })
 ```
 
-## Typing Runtime Config
+## 为运行时配置添加类型
 
-Nuxt attempts to automatically generate TypeScript interfaces for your configuration using the `unjs/untyped` library. However, you can manually define types:
+Nuxt 会尝试使用 `unjs/untyped` 库为配置自动生成 TypeScript 接口。不过你也可以手动定义类型：
 
 ```ts
 // index.d.ts
@@ -152,4 +150,4 @@ declare module 'nuxt/schema' {
 export {}
 ```
 
-End-users can leverage `nuxt/schema` to access the specific schema version their project uses. Module creators should augment `@nuxt/schema` instead.
+最终用户可通过 `nuxt/schema` 获取项目所用的具体 schema 版本；模块作者则应改为扩展 `@nuxt/schema`。

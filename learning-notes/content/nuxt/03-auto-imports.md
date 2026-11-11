@@ -1,14 +1,12 @@
 ---
-title: "Auto-imports"
-description: "How Nuxt automatically imports components, composables, utilities, and Vue APIs to streamline development."
+title: "Nuxt 自动导入（auto-imports）机制"
+description: "介绍 Nuxt 如何自动导入组件、组合式函数、工具函数与 Vue API，简化开发流程。"
 category: "nuxt"
 date: "2026-07-01"
 source: "https://nuxt.com/docs/guide/concepts/auto-imports"
 ---
 
-# Auto-imports
-
-Nuxt automatically brings in components, composables, and Vue.js APIs so you can use them throughout your app without writing explicit import statements.
+Nuxt 会自动引入组件、组合式函数（composables）与 Vue.js API，让你在应用中随处使用，无需编写显式的导入语句。
 
 ```vue
 <script setup lang="ts">
@@ -16,78 +14,78 @@ const count = ref(1) // ref is auto-imported
 </script>
 ```
 
-Because of its specific folder layout, Nuxt can automatically import items from your `app/components/`, `app/composables/`, and `app/utils/` directories.
+得益于特定的目录结构，Nuxt 能自动导入 `app/components/`、`app/composables/` 与 `app/utils/` 目录中的内容。
 
-Unlike traditional global declarations, this approach maintains TypeScript typings, IDE completions, and ensures it only includes what is used in your production code.
+与传统的全局声明不同，这种方式保留 TypeScript 类型、IDE 补全，并确保生产代码只包含实际用到的部分。
 
-Any function in the documentation that isn't explicitly imported is handled by Nuxt automatically. You can also auto-import exported functions from the `server/utils/` directory. Furthermore, custom folders or third-party packages can be configured via the `imports` section in your `nuxt.config` file.
+文档中任何没有显式导入的函数都由 Nuxt 自动处理。你也可以自动导入 `server/utils/` 目录中导出的函数。此外，可通过 `nuxt.config` 文件中的 `imports` 配置段设置自定义目录或第三方包。
 
-## Built-in Auto-imports
+## 内置自动导入
 
-The framework automatically imports composables and functions for tasks like data fetching, accessing app context and runtime configuration, managing state, and defining plugins or components.
+框架会自动导入用于数据获取、访问应用上下文与运行时配置、管理状态，以及定义插件或组件的组合式函数与函数。
 
 ```vue
 <script setup lang="ts">
-/* useFetch() is auto-imported */
+/* useFetch() 是自动导入的 */
 const { data, refresh, status } = await useFetch('/api/hello')
 </script>
 ```
 
-Vue's Reactivity APIs, such as `computed` and `ref`, along with lifecycle helpers, are also brought in automatically.
+Vue 的响应式 API，如 `computed` 与 `ref`，以及生命周期辅助函数，也会被自动引入。
 
 ```vue
 <script setup lang="ts">
-/* ref() and computed() are auto-imported */
+/* ref() 和 computed() 是自动导入的 */
 const count = ref(1)
 const double = computed(() => count.value * 2)
 </script>
 ```
 
-### Vue and Nuxt Composables
+### Vue 与 Nuxt 组合式函数
 
-When utilizing built-in Composition API tools from Vue and Nuxt, remember that many require being invoked within the correct context.
+使用 Vue 与 Nuxt 内置的组合式 API（Composition API）工具时，要记住其中许多需要在正确的上下文中调用。
 
-During a component's lifecycle, Vue tracks the temporary instance of the current component via a global variable, unsetting it in the same tick. Nuxt does something similar with `nuxtApp`. This prevents cross-request state pollution during server rendering.
+在组件生命周期中，Vue 通过一个全局变量跟踪当前组件的临时实例，并在同一 tick 内将其清除。Nuxt 用 `nuxtApp` 做类似的事。这可以避免服务端渲染期间出现跨请求的状态污染。
 
-Consequently, you generally cannot use these outside of a Nuxt plugin, route middleware, or Vue setup function. They must also be used synchronously. You cannot use `await` before calling a composable, except within `<script setup>` blocks, the setup function of a component using `defineNuxtComponent`, `defineNuxtPlugin`, or `defineNuxtRouteMiddleware`.
+因此，通常不能在 Nuxt 插件、路由中间件或 Vue setup 函数之外使用它们，并且必须同步调用。除非是在 `<script setup>` 块中，或使用了 `defineNuxtComponent`、`defineNuxtPlugin`、`defineNuxtRouteMiddleware` 的组件 setup 函数里，否则不能在调用组合式函数之前使用 `await`。
 
-If you encounter an error stating "Nuxt instance is unavailable", you are likely invoking a Nuxt composable in an incorrect lifecycle location.
+若遇到 "Nuxt instance is unavailable" 报错，很可能是在错误的生命周期位置调用了 Nuxt 组合式函数。
 
-**Example of breaking code:**
+**错误用法示例：**
 
 ```ts
-// trying to access runtime config outside a composable
+// 尝试在组合式函数外访问运行时配置
 const config = useRuntimeConfig()
 
 export const useMyComposable = () => {
-  // accessing runtime config here
+  // 在此处访问运行时配置
 }
 ```
 
-**Example of working code:**
+**正确用法示例：**
 
 ```ts
 export const useMyComposable = () => {
-  // Because your composable is called in the right place in the lifecycle,
-  // useRuntimeConfig will work here
+  // 由于组合式函数在生命周期中的正确位置被调用，
+  // useRuntimeConfig 在此处可用
   const config = useRuntimeConfig()
   // ...
 }
 ```
 
-## Directory-based Auto-imports
+## 基于目录的自动导入
 
-Files placed in specific folders are imported directly:
+放在特定目录下的文件会被直接导入：
 
-- `app/components/` for Vue components.
-- `app/composables/` for Vue composables.
-- `app/utils/` for helper functions and utilities.
+- `app/components/`：Vue 组件。
+- `app/composables/`：Vue 组合式函数。
+- `app/utils/`：辅助函数与工具函数。
 
-Note that auto-imported `ref` and `computed` properties will not be unwrapped automatically inside a component `<template>` due to how Vue handles refs that aren't top-level.
+注意，由于 Vue 对非顶层 ref 的处理方式，自动导入的 `ref` 与 `computed` 属性在组件 `<template>` 中不会自动解包。
 
-### Explicit Imports
+### 显式导入
 
-Every auto-imported item is exposed via the `#imports` alias, allowing you to make the import explicit if desired:
+每个自动导入项都通过 `#imports` 别名暴露，需要时可以写成显式导入：
 
 ```vue
 <script setup lang="ts">
@@ -98,9 +96,9 @@ const double = computed(() => count.value * 2)
 </script>
 ```
 
-### Disabling Auto-imports
+### 关闭自动导入
 
-To turn off automatic importing for composables and utilities, set `imports.autoImport` to `false` in your configuration file.
+要关闭组合式函数与工具函数的自动导入，在配置文件中把 `imports.autoImport` 设为 `false`。
 
 ```ts
 export default defineNuxtConfig({
@@ -110,11 +108,11 @@ export default defineNuxtConfig({
 })
 ```
 
-This completely disables the feature, though you can still rely on explicit imports from `#imports`.
+这会完全关闭该功能，但仍可从 `#imports` 显式导入。
 
-### Partially Disabling Auto-imports
+### 部分关闭自动导入
 
-If you want framework functions like `ref` to remain automatic but prefer to manually import your own custom code, set the `imports.scan` option to `false`:
+如果希望 `ref` 这类框架函数仍自动导入，但自己的自定义代码改为手工导入，把 `imports.scan` 选项设为 `false`：
 
 ```ts
 export default defineNuxtConfig({
@@ -124,11 +122,11 @@ export default defineNuxtConfig({
 })
 ```
 
-## Auto-imported Components
+## 自动导入的组件
 
-Components from your `~/components` directory are also brought in automatically, though this is configured separately from utilities and composables.
+`~/components` 目录中的组件同样会被自动导入，但这项配置与工具函数、组合式函数是分开的。
 
-To disable this behavior for your own components directory, set `components.dirs` to an empty array:
+要为自己的组件目录关闭该行为，把 `components.dirs` 设为空数组：
 
 ```ts
 export default defineNuxtConfig({
@@ -138,9 +136,9 @@ export default defineNuxtConfig({
 })
 ```
 
-## Auto-import from Third-Party Packages
+## 从第三方包自动导入
 
-You can also configure automatic imports for external packages. Enable it manually using the `presets` array:
+也可以为外部包配置自动导入，通过 `presets` 数组手动开启：
 
 ```ts
 export default defineNuxtConfig({

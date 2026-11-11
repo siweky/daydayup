@@ -25,6 +25,7 @@ const categories = [
   { value: 'nuxt', label: 'Nuxt 文档' },
   { value: 'nitro', label: 'Nitro 文档' },
   { value: 'python', label: 'Python 文档' },
+  { value: 'ai-agent', label: 'AI Agent 文档' },
 ]
 
 const pendingCount = computed(() => pendingFiles.value.filter(f => f.status === 'pending').length)
@@ -152,6 +153,7 @@ function getCategoryIcon(cat: string): string {
     nuxt: '💚',
     nitro: '⚡',
     python: '🐍',
+    'ai-agent': '🤖',
   }
   return icons[cat] || '📄'
 }

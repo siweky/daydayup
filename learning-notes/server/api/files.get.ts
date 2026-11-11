@@ -3,7 +3,7 @@ import { join, relative, extname } from 'node:path'
 
 export default defineEventHandler(async () => {
   const contentDir = join(process.cwd(), 'content')
-  const categories = ['notes', 'nuxt', 'nitro', 'python']
+  const categories = ['notes', 'nuxt', 'nitro', 'python', 'ai-agent']
   const files: Array<{ name: string; category: string; path: string }> = []
 
   for (const category of categories) {

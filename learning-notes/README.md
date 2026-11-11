@@ -1,10 +1,8 @@
-# Nuxt Content Starter
+# 学习笔记站（Nuxt Content）
 
-Look at the [Nuxt Content documentation](https://content.nuxt.com) to learn more.
+基于 Nuxt 4 + @nuxt/content v3 + Nitro 的个人学习笔记站，内容按「个人笔记 / Nuxt / Nitro / Python / AI Agent」五个分类组织，全部为 Markdown 文档。更多用法见 [Nuxt Content 文档](https://content.nuxt.com)。
 
-## Setup
-
-Make sure to install dependencies:
+## 安装依赖
 
 ```bash
 # npm
@@ -20,9 +18,9 @@ yarn install
 bun install
 ```
 
-## Development Server
+## 启动开发服务器
 
-Start the development server on `http://localhost:3000`:
+在 `http://localhost:3000/daydayup/` 启动开发服务器（站点配置了 `/daydayup/` 作为 baseURL）：
 
 ```bash
 # npm
@@ -38,9 +36,9 @@ yarn dev
 bun run dev
 ```
 
-## Production
+## 生产构建
 
-Build the application for production:
+构建生产环境产物：
 
 ```bash
 # npm
@@ -56,7 +54,7 @@ yarn build
 bun run build
 ```
 
-Locally preview production build:
+本地预览构建产物：
 
 ```bash
 # npm
@@ -72,4 +70,8 @@ yarn preview
 bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+更多部署方式见 [Nuxt 部署文档](https://nuxt.com/docs/getting-started/deployment)。
+
+## 新增一篇笔记
+
+把 `.md` 文件放进 `content/<分类>/`，frontmatter 至少需要 `title`、`description`、`category`、`date`；正文从 `##` 开始（详情页会用它生成目录）。新增分类时还需要同步 `content.config.ts`、`app/pages/<分类>.vue`、导航与首页、管理页分类选项，以及 `server/api/files.get.ts` 与 `server/api/upload.post.ts` 的白名单。

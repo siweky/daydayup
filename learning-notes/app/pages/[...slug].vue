@@ -9,11 +9,19 @@ const pathParts = computed(() => {
   return p ? [p] : []
 })
 
-const collectionName = computed(() => {
-  const first = pathParts.value[0] || ''
-  if (['notes', 'nuxt', 'nitro', 'python'].includes(first)) return first
-  return ''
-})
+// 路径首段，用于面包屑与「返回列表」
+const section = computed(() => pathParts.value[0] || '')
+
+// 路径段 -> 内容集合键（ai-agent 目录对应 content.config.ts 中的 aiAgent）
+const collectionKeyMap: Record<string, string> = {
+  notes: 'notes',
+  nuxt: 'nuxt',
+  nitro: 'nitro',
+  python: 'python',
+  'ai-agent': 'aiAgent',
+}
+
+const collectionName = computed(() => collectionKeyMap[section.value] || '')
 
 const fullPath = computed(() => '/' + pathParts.value.join('/'))
 
@@ -23,7 +31,7 @@ const { data: page } = await useAsyncData(
   async () => {
     const col = collectionName.value
     if (col) {
-      return queryCollection(col as 'notes' | 'nuxt' | 'nitro' | 'python')
+      return queryCollection(col as 'notes' | 'nuxt' | 'nitro' | 'python' | 'aiAgent')
         .path(fullPath.value)
         .first()
     }
@@ -49,6 +57,8 @@ const breadcrumbs = computed(() => {
     nuxt: 'Nuxt',
     nitro: 'Nitro',
     python: 'Python',
+    'ai-agent': 'AI Agent',
+    aiAgent: 'AI Agent',
   }
 
   if (parts.length > 0 && categoryLabels[parts[0]]) {
@@ -114,8 +124,8 @@ const tocHeadings = computed(() => {
 })
 
 function goBack() {
-  const col = collectionName.value
-  if (col) {
+  const col = section.value
+  if (collectionKeyMap[col]) {
     router.push(`/${col}`)
   } else {
     router.push('/')
@@ -128,6 +138,8 @@ function getCategoryLabel(col: string): string {
     nuxt: 'Nuxt',
     nitro: 'Nitro',
     python: 'Python',
+    'ai-agent': 'AI Agent',
+    aiAgent: 'AI Agent',
   }
   return labels[col] || col
 }

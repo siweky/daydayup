@@ -1,23 +1,21 @@
 ---
-title: "Routing"
-description: "Nuxt file-system routing creates a route for every file in the pages/ directory."
+title: "Nuxt 文件系统路由（routing）"
+description: "Nuxt 的文件系统路由会为 pages/ 目录下的每个文件创建一条路由。"
 category: "nuxt"
 date: "2026-07-01"
 source: "https://nuxt.com/docs/getting-started/routing"
 ---
 
-# Routing
+Nuxt 的一项核心特性是文件系统路由（file system router）。`app/pages/` 目录下的每个 Vue 文件都会生成一个对应的 URL（即路由），用于展示该文件的内容。通过对每个页面使用动态导入，Nuxt 借助代码分割（code splitting）只为所请求的路由下发最少的 JavaScript。
 
-One core feature of Nuxt is the file system router. Every Vue file inside the `app/pages/` directory creates a corresponding URL (or route) that displays the contents of the file. By using dynamic imports for each page, Nuxt leverages code-splitting to ship the minimum amount of JavaScript for the requested route.
+## 页面
 
-## Pages
+Nuxt 路由基于 [vue-router](https://router.vuejs.org)，根据 `app/pages/` 目录中每个组件的文件名生成路由。
 
-Nuxt routing is based on [vue-router](https://router.vuejs.org) and generates the routes from every component created in the `app/pages/` directory, based on their filename.
-
-This file system routing uses naming conventions to create dynamic and nested routes:
+这种文件系统路由通过命名约定创建动态路由与嵌套路由：
 
 ```bash
-# Directory Structure
+# 目录结构
 -| pages/
 ---| about.vue
 ---| index.vue
@@ -26,7 +24,7 @@ This file system routing uses naming conventions to create dynamic and nested ro
 ```
 
 ```json
-// Generated Router File
+// 生成的路由文件
 {
   "routes": [
     {
@@ -45,11 +43,11 @@ This file system routing uses naming conventions to create dynamic and nested ro
 }
 ```
 
-## Navigation
+## 导航
 
-The `<NuxtLink>` component links pages between them. It renders an `<a>` tag with the `href` attribute set to the route of the page. Once the application is hydrated, page transitions are performed in JavaScript by updating the browser URL. This prevents full-page refreshes and allows for animated transitions.
+`<NuxtLink>` 组件用于在页面之间建立链接。它渲染一个 `<a>` 标签，`href` 属性设为目标页面的路由。应用完成注水（hydration）后，页面切换由 JavaScript 通过更新浏览器 URL 完成，从而避免整页刷新，并支持动画过渡。
 
-When a `<NuxtLink>` enters the viewport on the client side, Nuxt will automatically prefetch components and payload of the linked pages ahead of time, resulting in faster navigation.
+在客户端，当 `<NuxtLink>` 进入视口时，Nuxt 会提前自动预取所链接页面的组件与载荷（payload），让导航更快。
 
 ```vue
 <template>
@@ -65,39 +63,39 @@ When a `<NuxtLink>` enters the viewport on the client side, Nuxt will automatica
 </template>
 ```
 
-## Route Parameters
+## 路由参数
 
-The `useRoute()` composable can be used in a `<script setup>` block or a `setup()` method of a Vue component to access the current route details.
+可以在 Vue 组件的 `<script setup>` 块或 `setup()` 方法中使用 `useRoute()` 组合式函数，访问当前路由的详细信息。
 
 ```vue
 <script setup lang="ts">
 const route = useRoute()
 
-// When accessing /posts/1, route.params.id will be 1
+// 访问 /posts/1 时，route.params.id 为 1
 console.log(route.params.id)
 </script>
 ```
 
-## Route Middleware
+## 路由中间件
 
-Nuxt provides a customizable route middleware framework you can use throughout your application, ideal for extracting code that you want to run before navigating to a particular route.
+Nuxt 提供可自定义的路由中间件（route middleware）框架，可在整个应用中使用，适合把进入特定路由前要执行的代码抽取出来。
 
-> Route middleware runs within the Vue part of your Nuxt app. Despite the similar name, they are completely different from server middleware, which are run in the Nitro server part of your app.
+> 路由中间件运行在 Nuxt 应用的 Vue 部分。尽管名称相近，它与运行在应用 Nitro 服务端部分的服务器中间件完全不同。
 
-> Route middleware does **not** run for server routes (e.g. `/api/*`) or other server requests. To apply middleware to these requests, use server middleware instead.
+> 路由中间件**不会**对服务端路由（如 `/api/*`）或其他服务端请求执行。若要给这些请求应用中间件，请改用服务器中间件。
 
-There are three kinds of route middleware:
+路由中间件分为三类：
 
-1. **Anonymous (or inline) route middleware**, which are defined directly in the pages where they are used.
-2. **Named route middleware**, which are placed in the `app/middleware/` directory and will be automatically loaded via asynchronous import when used on a page.
-3. **Global route middleware**, which are placed in the `app/middleware/` directory (with a `.global` suffix) and will be automatically run on every route change.
+1. **匿名（或内联）路由中间件**，直接定义在使用它的页面中。
+2. **具名路由中间件**，放在 `app/middleware/` 目录中，在页面中使用时通过异步导入自动加载。
+3. **全局路由中间件**，放在 `app/middleware/` 目录中（带 `.global` 后缀），每次路由变化都会自动执行。
 
-Example of an `auth` middleware protecting the `/dashboard` page:
+保护 `/dashboard` 页面的 `auth` 中间件示例：
 
 ```ts
 // middleware/auth.ts
 export default defineNuxtRouteMiddleware((to, from) => {
-  // isAuthenticated() is an example method verifying if a user is authenticated
+  // isAuthenticated() 是一个校验用户是否已认证的示例方法
   if (isAuthenticated() === false) {
     return navigateTo('/login')
   }
@@ -117,17 +115,17 @@ definePageMeta({
 </template>
 ```
 
-## Route Validation
+## 路由校验
 
-Nuxt offers route validation via the `validate` property in `definePageMeta()` in each page you wish to validate.
+Nuxt 通过每个待校验页面中 `definePageMeta()` 的 `validate` 属性提供路由校验。
 
-The `validate` property accepts the `route` as an argument. You can return a boolean value to determine whether or not this is a valid route to be rendered with this page. If you return `false`, this will cause a 404 error. You can also directly return an object with `status`/`statusText` to customize the error returned.
+`validate` 属性接收 `route` 作为参数。可以返回布尔值，判断该路由是否应由当前页面渲染；返回 `false` 会触发 404 错误。也可以直接返回带 `status`/`statusText` 的对象，自定义返回的错误。
 
 ```vue
 <script setup lang="ts">
 definePageMeta({
   validate (route) {
-    // Check if the id is made up of digits
+    // 检查 id 是否由数字组成
     return typeof route.params.id === 'string' && /^\d+$/.test(route.params.id)
   },
 })
